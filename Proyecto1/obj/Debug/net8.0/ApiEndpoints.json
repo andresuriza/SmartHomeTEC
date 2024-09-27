@@ -1,0 +1,28 @@
+[
+  {
+    "ContainingType": "Proyecto1.Controllers.LoginController",
+    "Method": "Get",
+    "RelativePath": "api/Login",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.LoginController",
+    "Method": "Post",
+    "RelativePath": "api/Login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "payload",
+        "Type": "Newtonsoft.Json.Linq.JObject",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
