@@ -1,0 +1,14 @@
+{
+  "name": "smarthometec",
+  "version": "1.0.0",
+  "description": "Proyecto 1 del curso Base de Datos",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "create-react-app": "^5.0.1"
+  }
+}
