@@ -22,23 +22,27 @@ export default function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit2 = (e) => {
     e.preventDefault();
-
+  
     // Simular autenticación (Reemplaza esta lógica con una llamada a tu API)
-    if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
-      // Si el login es exitoso, redirigir al dashboard del administrador
+    if (formData.email === 'user@example.com' && formData.password === 'user123') {
+      // Si el login es exitoso para el cliente, redirigir al dashboard del cliente
+      navigate("/client");
+    } else if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
+      // Si el login es exitoso para el administrador, redirigir al dashboard del administrador
       navigate("/admin-dashboard");
     } else {
       // Si los datos no coinciden, mostrar mensaje de error
       setErrorMessage('Email o contraseña incorrectos');
     }
   };
+  
 
   return (
     <div className="iniciar-sesion">
       <h1 className="login">INICIAR SESIÓN</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit2}>
         <div className="input-container">
           <label htmlFor="email">Email</label>
           <input

@@ -6,6 +6,9 @@ import Home from "./components/pages/Home";
 import Login from "./components/pages/Login";
 import Registrarse from "./components/pages/Registrarse";
 import AdminDashboard from "./components/pages/AdminDashboard";
+import ClientView from "./components/pages/ClientView";
+import OnlineStore from "./components/pages/OnlineStore";
+import ManageStore from "./components/pages/ManageStore";
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registrarse" element={<Registrarse />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/client" element={<ClientView />} />
+          <Route path="/tienda" element={<OnlineStore />} />
+          <Route path="/gestionar-tienda" element={<ManageStore />} />
         </Routes>
       </Router>
     </>
