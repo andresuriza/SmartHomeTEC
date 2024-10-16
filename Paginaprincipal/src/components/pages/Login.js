@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import "../../App.css";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../AuthContext"; // Importar el contexto de autenticación
 import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Usar la función login del contexto
 
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  const [errorMessage, setErrorMessage] = useState(''); // Para manejar errores
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -22,22 +24,43 @@ export default function Login() {
     });
   };
 
-  const handleSubmit2 = (e) => {
+  const handleSubmit2 = async (e) => {
     e.preventDefault();
-  
-    // Simular autenticación (Reemplaza esta lógica con una llamada a tu API)
-    if (formData.email === 'user@example.com' && formData.password === 'user123') {
-      // Si el login es exitoso para el cliente, redirigir al dashboard del cliente
-      navigate("/client");
-    } else if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
-      // Si el login es exitoso para el administrador, redirigir al dashboard del administrador
-      navigate("/admin-dashboard");
-    } else {
-      // Si los datos no coinciden, mostrar mensaje de error
-      setErrorMessage('Email o contraseña incorrectos');
+
+    try {
+      const response = await fetch("https://localhost:5555/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.userId) {
+          // Usar la función login del contexto para guardar el estado global
+          login({
+            userId: data.userId,
+            nombre: data.nombre,
+            token: data.token // Si tienes un token, también puedes guardarlo
+          });
+          
+          // Redirigir a la página de inicio o dashboard
+          navigate("/");
+        }
+      } else {
+        setErrorMessage(data.message || "Error al iniciar sesión");
+      }
+    } catch (error) {
+      console.error("Error al conectarse con la API:", error);
+      setErrorMessage("Error al conectarse con la API");
     }
   };
-  
 
   return (
     <div className="iniciar-sesion">
@@ -63,7 +86,7 @@ export default function Login() {
             onChange={handleInputChange}
           />
         </div>
-        {errorMessage && <p className="error-message">{errorMessage}</p>} {/* Mostrar error */}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
         <div className="button-container">
           <button type="submit">
             Iniciar Sesión
@@ -76,5 +99,3 @@ export default function Login() {
     </div>
   );
 }
-
-

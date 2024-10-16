@@ -9,22 +9,29 @@ import AdminDashboard from "./components/pages/AdminDashboard";
 import ClientView from "./components/pages/ClientView";
 import OnlineStore from "./components/pages/OnlineStore";
 import ManageStore from "./components/pages/ManageStore";
+import { AuthProvider } from "./AuthContext"; // Importa el AuthProvider
+import ProfileManagement from "./components/pages/ProfileManagement";
+import DeviceReports from "./components/pages/DeviceReports";
 
 function App() {
   return (
     <>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" exact element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registrarse" element={<Registrarse />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/client" element={<ClientView />} />
-          <Route path="/tienda" element={<OnlineStore />} />
-          <Route path="/gestionar-tienda" element={<ManageStore />} />
-        </Routes>
-      </Router>
+      <AuthProvider>  {/* Envolvemos la aplicación con AuthProvider */}
+        <Router>
+          <Navbar />  {/* El Navbar tendrá acceso al contexto de autenticación */}
+          <Routes>
+            <Route path="/" exact element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registrarse" element={<Registrarse />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/client" element={<ClientView />} />
+            <Route path="/tienda" element={<OnlineStore />} />
+            <Route path="/gestionar-tienda" element={<ManageStore />} />
+            <Route path="/profile" element={<ProfileManagement />} />
+            <Route path="/reports" element={<DeviceReports />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </>
   );
 }

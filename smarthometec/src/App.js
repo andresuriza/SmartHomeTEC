@@ -17,12 +17,13 @@ function App() {
   const postInfo = () => {
     axios
       .post("https://localhost:5555/api/Users", {
-        name: "Gabriel",
-        lastName: "Guzman",
-        region: "Costa Rica",
-        email: "guz@gmail.com",
-        password: "1234",
-        address: "Cartago",
+        "Nombre": "Guz",
+        "Apellidos": "Guz",
+        "Region": "San José",
+        "CorreoElectronico": "Guz@example.com",
+        "Contraseña": "password123",
+        "DireccionEntrega": "Calle Falsa 123",
+        "Dispositivos": []
       })
       .then((res) => {
         console.log(res);
