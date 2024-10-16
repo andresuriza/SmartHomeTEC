@@ -10,7 +10,7 @@ class MyDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
         // Crear las tablas
         db.execSQL("""CREATE TABLE IF NOT EXISTS Aposentos (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Nombre TEXT NOT NULL UNIQUE,
+            Nombre TEXT NOT NULL ,
             UsuarioAso TEXT,
             FOREIGN KEY(UsuarioAso) REFERENCES Cliente(username)
         )""")

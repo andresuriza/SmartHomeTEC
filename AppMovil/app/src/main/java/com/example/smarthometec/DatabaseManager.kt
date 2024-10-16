@@ -181,9 +181,14 @@ import android.content.Context
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.OutputStream
 
 class DatabaseManager(private val context: Context) {
     private val dbHelper = MyDatabaseHelper(context)
@@ -222,6 +227,33 @@ class DatabaseManager(private val context: Context) {
         @SuppressLint("SdCardPath")
         private const val DATABASE_PATH = "/data/data/com.example.samrthometec/databases/"
     }
+
+
+
+    fun copyDatabaseToLocalFolder() {
+        val dbPath = context.getDatabasePath(DATABASE_NAME).absolutePath
+        val localPath = "C:/Users/gabri/Downloads/BaseNueva/"
+        val destinationFilePath = localPath + DATABASE_NAME
+
+        val source = File(dbPath)
+        val destination = File(destinationFilePath)
+
+        // Crea la carpeta si no existe
+        val destinationDirectory = File(localPath)
+        if (!destinationDirectory.exists()) {
+            destinationDirectory.mkdirs()
+        }
+
+        FileInputStream(source).use { input ->
+            FileOutputStream(destination).use { output ->
+                input.copyTo(output)
+            }
+        }
+        Log.d("DatabaseManager", "Database copied to: $destinationFilePath")
+    }
+
+
+
 
     fun getAposentosByUser(username: String): List<String> {
         val aposentosList = mutableListOf<String>()
@@ -284,6 +316,7 @@ class DatabaseManager(private val context: Context) {
             val cursor = db.rawQuery("SELECT * FROM Aposentos WHERE Nombre = ?", arrayOf(nombre))
             if (cursor.moveToFirst()) {
                 Log.d("DatabaseManager", "Inserted aposento found in database: ${cursor.getString(0)}")
+                copyDatabaseToLocalFolder()
             } else {
                 Log.e("DatabaseManager", "Inserted aposento not found in database")
             }
@@ -316,4 +349,52 @@ class DatabaseManager(private val context: Context) {
         return exists
 
     }
+    fun addDevice(description: String, type: String, brand: String, serialNumber: Int, consumption: Int, roomId: Int, username: String) {
+        val db = dbHelper.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put("Descripcion", description)
+                put("Tipo", type)
+                put("Marca", brand)
+                put("Numero Serie", serialNumber)
+                put("Consumo", consumption)
+                put("IdAposento", roomId)
+                put("UsuarioAso", username)
+            }
+            val result = db.insert("Dispositivos", null, values)
+            if (result == -1L) {
+                Log.e("DatabaseManager", "Error inserting Device: $description")
+            } else {
+                Log.d("DatabaseManager", "Device added: $description for user $username")
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error adding Device: ${e.message}")
+        } finally {
+            db.close()
+        }
+    }
+
+    fun getDevicesByUser(username: String): List<String> {
+        val devicesList = mutableListOf<String>()
+        val db = dbHelper.readableDatabase
+        try {
+            val cursor = db.rawQuery(
+                "SELECT Descripcion, Tipo, Marca, `Numero Serie`, Consumo, IdAposento FROM Dispositivos WHERE UsuarioAso = ?",
+                arrayOf(username)
+            )
+            if (cursor.moveToFirst()) {
+                do {
+                    val device = "${cursor.getString(0)} (${cursor.getString(1)}, ${cursor.getString(2)}, ${cursor.getInt(3)}, Consumo: ${cursor.getInt(4)}, Aposento ID: ${cursor.getInt(5)})"
+                    devicesList.add(device)
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching Devices: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return devicesList
+    }
+
 }
