@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.samrthometec.databinding.ActivityAposentosBinding
-import com.example.smarthometec.DatabaseManager
+import com.example.samrthometec.DatabaseManager
 
 class Aposentos : AppCompatActivity() {
 

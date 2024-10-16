@@ -9,12 +9,13 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.samrthometec.databinding.ActivityLoginBinding
 import android.database.sqlite.SQLiteDatabase
-import com.example.smarthometec.DatabaseManager
+import com.example.samrthometec.DatabaseManager
 
 class Login : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var db: SQLiteDatabase  // Base de datos SQLite
+  //  private lateinit var db: SQLiteDatabase  // Base de datos SQLite
+    private lateinit var databaseManager: DatabaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,9 +25,12 @@ class Login : AppCompatActivity() {
         setContentView(binding.root)
 
         // Inicializar la base de datos
-        val databaseManager = DatabaseManager(this)
-        db = databaseManager.openDatabase()
-
+        databaseManager = DatabaseManager(this)
+        //db = databaseManager.readableDatabase
+        if (!databaseManager.checkDatabase()) {
+            Toast.makeText(this, "Database not found!", Toast.LENGTH_SHORT).show()
+            return
+        }
         // Referencias a los elementos de la interfaz
         val usernameEditText: EditText = binding.username
         val passwordEditText: EditText = binding.password
@@ -39,7 +43,7 @@ class Login : AppCompatActivity() {
             val password = passwordEditText.text.toString()
 
             // Validar credenciales con la base de datos
-            if (checkUser(username, password)) {
+            if (databaseManager.checkUser(username, password)) {
                 // Mostrar un mensaje de éxito y redirigir
                 Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, Aposentos::class.java)
@@ -60,9 +64,9 @@ class Login : AppCompatActivity() {
         }
     }
 
-    // Método para verificar si un usuario existe en la base de datos
+/*    // Método para verificar si un usuario existe en la base de datos
     private fun checkUser(username: String, password: String): Boolean {
-        val cursor = db.rawQuery(
+        val cursor = DatabaseManager.rawQuery(
             "SELECT * FROM Cliente WHERE username = ? AND password = ?",
             arrayOf(username, password)
         )
@@ -75,7 +79,7 @@ class Login : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         db.close()
-    }
+    }*/
 }
 
 //package com.example.samrthometec

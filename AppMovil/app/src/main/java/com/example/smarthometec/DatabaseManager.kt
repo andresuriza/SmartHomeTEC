@@ -1,9 +1,10 @@
-package com.example.smarthometec
-
+package com.example.samrthometec
+/*
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteDatabaseLockedException
 import java.io.File
 import android.util.Log
 import java.io.FileOutputStream
@@ -14,6 +15,7 @@ class DatabaseManager(private val context: Context) {
 
     // Nombre y ruta de la base de datos
     private val DATABASE_NAME = "AppMovil.db"
+
     @SuppressLint("SdCardPath")
     private val DATABASE_PATH = "/data/data/${context.packageName}/databases/"
     private val DATABASE_VERSION = 1
@@ -56,26 +58,42 @@ class DatabaseManager(private val context: Context) {
 
     // Abre la base de datos existente
     fun openDatabase(): SQLiteDatabase {
-        val db = SQLiteDatabase.openDatabase(
-            DATABASE_PATH + DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE
-        )
+        var db: SQLiteDatabase? = null
+        var attempts = 0
+        while (db == null && attempts < 5) {
+            try {
+                db = SQLiteDatabase.openDatabase(
+                    DATABASE_PATH + DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE
+                )
+            } catch (e: SQLiteDatabaseLockedException) {
+                Log.e("DatabaseManager", "Database locked, retrying... (attempt ${attempts + 1})")
+                Thread.sleep(50) // espera antes de reintentar
+                attempts++
+            }
+        }
+        if (db == null) {
+            throw SQLiteDatabaseLockedException("Unable to open database after multiple attempts.")
+        }
         Log.d("DatabaseManager", "Opening database at: $DATABASE_PATH")
         createTables(db) // Asegura que las tablas sean creadas si no existen
         return db
     }
 
+
     // Método para crear la tabla si no existe
     private fun createTables(db: SQLiteDatabase) {
         try {
             Log.d("DatabaseManager", "Creating tables if not exist.")
-            db.execSQL("""
+            db.execSQL(
+                """
                 CREATE TABLE IF NOT EXISTS Aposentos (
                     ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     Nombre TEXT NOT NULL UNIQUE,
                     UsuarioAso TEXT,
                     FOREIGN KEY(UsuarioAso) REFERENCES Cliente(username)
                 );
-            """.trimIndent())
+            """.trimIndent()
+            )
             Log.d("DatabaseManager", "Tables created or already exist.")
         } catch (e: Exception) {
             Log.e("DatabaseManager", "Error creating tables: ${e.message}")
@@ -87,7 +105,8 @@ class DatabaseManager(private val context: Context) {
         val db = openDatabase()
         try {
             Log.d("DatabaseManager", "Fetching Aposentos for user: $username")
-            val cursor = db.rawQuery("SELECT Nombre FROM Aposentos WHERE UsuarioAso = ?", arrayOf(username))
+            val cursor =
+                db.rawQuery("SELECT Nombre FROM Aposentos WHERE UsuarioAso = ?", arrayOf(username))
 
             if (cursor.moveToFirst()) {
                 do {
@@ -103,16 +122,140 @@ class DatabaseManager(private val context: Context) {
         return aposentosList
     }
 
-    // Método para agregar un nuevo aposento
-/*    fun addAposento(nombre: String, usuarioAso: String) {
+
+    fun addAposento(nombre: String, usuarioAso: String) {
         val db = openDatabase()
+        try {
+            db.beginTransaction() // Inicia la transacción
+            Log.d("DatabaseManager", "Transaction started.")
+            val values = ContentValues().apply {
+                put("Nombre", nombre)
+                put("UsuarioAso", usuarioAso)
+            }
+            val result = db.insert("Aposentos", null, values)
+            if (result == -1L) {
+                Log.e("DatabaseManager", "Error inserting Aposento: $nombre")
+            } else {
+                Log.d("DatabaseManager", "Aposento added: $nombre for user $usuarioAso")
+                db.setTransactionSuccessful() // Marca la transacción como exitosa
+                Log.d("DatabaseManager", "Transaction marked as successful.")
+
+                // Llamar a checkAposentoExists después de la inserción
+                val exists = checkAposentoExists(nombre)
+                if (exists) {
+                    Log.d("DatabaseManager", "Aposento $nombre exists in the database.")
+                } else {
+                    Log.e("DatabaseManager", "Aposento $nombre does not exist in the database.")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error adding Aposento: ${e.message}")
+        } finally {
+            db.endTransaction() // Termina la transacción
+            Log.d("DatabaseManager", "Transaction ended.")
+            db.close()
+        }
+    }
+
+    fun checkAposentoExists(nombre: String): Boolean {
+        val db = openDatabase()
+        var exists = false
+        try {
+            val cursor = db.rawQuery("SELECT 1 FROM Aposentos WHERE Nombre = ?", arrayOf(nombre))
+            exists = cursor.moveToFirst()
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error checking Aposento: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return exists
+    }
+
+}
+
+*/
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.ContentValues
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+import java.io.File
+import java.io.FileOutputStream
+
+class DatabaseManager(private val context: Context) {
+    private val dbHelper = MyDatabaseHelper(context)
+
+    init {
+        copyDatabaseIfNeeded()
+    }
+
+    private fun copyDatabaseIfNeeded() {
+        val dbPath = context.getDatabasePath(DATABASE_NAME)
+        if (!dbPath.exists()) {
+            Log.d("DatabaseManager", "Database not found, copying from assets...")
+            context.assets.open(DATABASE_NAME).use { inputStream ->
+                FileOutputStream(dbPath).use { outputStream ->
+                    val buffer = ByteArray(1024)
+                    var length: Int
+                    while (inputStream.read(buffer).also { length = it } > 0) {
+                        outputStream.write(buffer, 0, length)
+                    }
+                    outputStream.flush()
+                    Log.d("DatabaseManager", "Database copy successful.")
+                }
+            }
+        } else {
+            Log.d("DatabaseManager", "Database already exists, no need to copy.")
+        }
+    }
+    fun checkDatabase(): Boolean {
+        val dbFile = File(DATABASE_PATH + DATABASE_NAME)
+        return dbFile.exists()
+    }
+
+    companion object {
+        private const val DATABASE_VERSION = 1
+        private const val DATABASE_NAME = "AppMovil.db"
+        @SuppressLint("SdCardPath")
+        private const val DATABASE_PATH = "/data/data/com.example.samrthometec/databases/"
+    }
+
+    fun getAposentosByUser(username: String): List<String> {
+        val aposentosList = mutableListOf<String>()
+        val db = dbHelper.readableDatabase
+        try {
+            val cursor =
+                db.rawQuery("SELECT Nombre FROM Aposentos WHERE UsuarioAso = ?", arrayOf(username))
+            if (cursor.moveToFirst()) {
+                do {
+                    aposentosList.add(cursor.getString(0))
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching Aposentos: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return aposentosList
+    }
+
+/*    fun addAposento(nombre: String, usuarioAso: String) {
+        val db = dbHelper.writableDatabase
         try {
             val values = ContentValues().apply {
                 put("Nombre", nombre)
                 put("UsuarioAso", usuarioAso)
             }
-            db.insert("Aposentos", null, values)
-            Log.d("DatabaseManager", "Aposento added: $nombre for user $usuarioAso")
+            val result = db.insert("Aposentos", null, values)
+            if (result == -1L) {
+                Log.e("DatabaseManager", "Error inserting Aposento: $nombre")
+            } else {
+                Log.d("DatabaseManager", "Aposento added: $nombre for user $usuarioAso")
+            }
         } catch (e: Exception) {
             Log.e("DatabaseManager", "Error adding Aposento: ${e.message}")
         } finally {
@@ -120,23 +263,31 @@ class DatabaseManager(private val context: Context) {
         }
     }*/
     fun addAposento(nombre: String, usuarioAso: String) {
-        val db = openDatabase()
+        val db = dbHelper.writableDatabase
         try {
+            Log.d("DatabaseManager", "Attempting to add aposento: $nombre for user $usuarioAso")
+            Log.d("DatabaseManager", "Database path: ${db.path}") // Verificar la ruta de la base de datos
+
             val values = ContentValues().apply {
                 put("Nombre", nombre)
                 put("UsuarioAso", usuarioAso)
             }
 
-            // Realiza la inserción y guarda el resultado
             val result = db.insert("Aposentos", null, values)
-
-            // Verifica si la inserción fue exitosa
             if (result == -1L) {
                 Log.e("DatabaseManager", "Error inserting Aposento: $nombre")
             } else {
                 Log.d("DatabaseManager", "Aposento added: $nombre for user $usuarioAso")
-
             }
+
+            // Verificar si los datos se guardaron correctamente
+            val cursor = db.rawQuery("SELECT * FROM Aposentos WHERE Nombre = ?", arrayOf(nombre))
+            if (cursor.moveToFirst()) {
+                Log.d("DatabaseManager", "Inserted aposento found in database: ${cursor.getString(0)}")
+            } else {
+                Log.e("DatabaseManager", "Inserted aposento not found in database")
+            }
+            cursor.close()
         } catch (e: Exception) {
             Log.e("DatabaseManager", "Error adding Aposento: ${e.message}")
         } finally {
@@ -144,122 +295,25 @@ class DatabaseManager(private val context: Context) {
         }
     }
 
+    // Método para verificar si un usuario existe en la base de datos
 
-    fun updateDatabase() {
-        val db = openDatabase()
+
+    fun checkUser(username: String, password: String): Boolean {
+        val db = dbHelper.readableDatabase
+        var exists = false
         try {
-            Log.d("DatabaseManager", "Updating database: Dropping and recreating tables.")
-            db.execSQL("DROP TABLE IF EXISTS Aposentos")
-            //createTables(db)
+            val cursor = db.rawQuery(
+                "SELECT * FROM Cliente WHERE username = ? AND password = ?",
+                arrayOf(username, password)
+            )
+            exists = cursor.moveToFirst()
+            cursor.close()
         } catch (e: Exception) {
-            Log.e("DatabaseManager", "Error updating database: ${e.message}")
+            Log.e("DatabaseManager", "Error checking user: ${e.message}")
         } finally {
             db.close()
         }
+        return exists
+
     }
 }
-
-
-
-/*
-package com.example.smarthometec
-
-import android.content.Context
-import android.content.ContentValues
-import android.database.sqlite.SQLiteDatabase
-import java.io.File
-import android.util.Log
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
-
-class DatabaseManager(private val context: Context) {
-
-    // Nombre y ruta de la base de datos
-    private val DATABASE_NAME = "AppMovil.db"
-    private val DATABASE_PATH = "/data/data/${context.packageName}/databases/"
-    private val DATABASE_VERSION = 1
-
-    init {
-        copyDatabaseIfNeeded()
-    }
-
-    // Copia la base de datos desde assets si no existe
-    private fun copyDatabaseIfNeeded() {
-        val dbFile = File(DATABASE_PATH + DATABASE_NAME)
-        if (!dbFile.exists()) {
-            Log.d("DatabaseManager", "Database not found, copying from assets...")
-            // Crear la carpeta "databases" si no existe
-            File(DATABASE_PATH).mkdirs()
-
-            // Copiar la base de datos desde assets
-            val inputStream: InputStream = context.assets.open(DATABASE_NAME)
-            val outputStream: OutputStream = FileOutputStream(dbFile)
-
-            val buffer = ByteArray(1024)
-            var length: Int
-            while (inputStream.read(buffer).also { length = it } > 0) {
-                outputStream.write(buffer, 0, length)
-            }
-
-            outputStream.flush()
-            outputStream.close()
-            inputStream.close()
-            Log.d("DatabaseManager", "Database copy successful.")
-        }
-    }
-
-    // Abre la base de datos existente
-    fun openDatabase(): SQLiteDatabase {
-        return SQLiteDatabase.openDatabase(
-            DATABASE_PATH + DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE
-
-        )
-        Log.d("DatabaseManager", "Opening database at: $DATABASE_PATH")
-    }
-    private fun createTables(db: SQLiteDatabase) {
-        db.execSQL("""
-            CREATE TABLE IF NOT EXISTS Aposentos (
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nombre TEXT NOT NULL UNIQUE,
-                UsuarioAso TEXT,
-                FOREIGN KEY(UsuarioAso) REFERENCES Cliente(username)
-            );
-        """.trimIndent())
-    }
-
-    fun getAposentosByUser(username: String): List<String> {
-        val aposentosList = mutableListOf<String>()
-        val db = openDatabase()
-        val cursor = db.rawQuery("SELECT Nombre FROM Aposentos WHERE UsuarioAso = ?", arrayOf(username))
-
-        if (cursor.moveToFirst()) {
-            do {
-                aposentosList.add(cursor.getString(0))
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return aposentosList
-    }
-
-    // Método para agregar un nuevo aposento
-    fun addAposento(nombre: String, usuarioAso: String) {
-        val db = openDatabase()
-        val values = ContentValues().apply {
-            put("Nombre", nombre)
-            put("UsuarioAso", usuarioAso)
-        }
-        db.insert("Aposentos", null, values)
-        db.close()
-    }
-    fun updateDatabase() {
-        val db = openDatabase()
-        // Aquí puedes manejar cambios entre versiones, si fuera necesario
-        db.execSQL("DROP TABLE IF EXISTS Aposentos")
-        createTables(db)
-        db.close()
-    }
-
-}
-*/
