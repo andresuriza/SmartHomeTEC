@@ -1,6 +1,6 @@
 
 package com.example.samrthometec
-/*
+
 
 import android.os.Bundle
 import android.widget.Toast
@@ -29,38 +29,46 @@ class AssociateDeviceActivity : AppCompatActivity() {
             val description = binding.deviceDescriptionEditText.text.toString().trim()
             val type = binding.deviceTypeEditText.text.toString().trim()
             val brand = binding.deviceBrandEditText.text.toString().trim()
-            val serialNumber = binding.deviceSerialEditText.text.toString().trim()
-            val consumption = binding.deviceConsumptionEditText.text.toString().trim()
+            val serialNumberStr = binding.deviceSerialEditText.text.toString().trim()
+            val consumptionStr = binding.deviceConsumptionEditText.text.toString().trim()
             val room = binding.deviceRoomEditText.text.toString().trim()
 
-            if (description.isEmpty() || type.isEmpty() || brand.isEmpty() || serialNumber.isEmpty() || consumption.isEmpty() || room.isEmpty()) {
+            if (description.isEmpty() || type.isEmpty() || brand.isEmpty() || serialNumberStr.isEmpty() || consumptionStr.isEmpty() || room.isEmpty()) {
                 Toast.makeText(this, "Todos los campos son obligatorios", Toast.LENGTH_SHORT).show()
             } else {
-                // Calcular la fecha de garantía
-                val currentDate = Date()
-                val guaranteePeriod = getGuaranteePeriodForType(type)
-                val guaranteeEndDate = Calendar.getInstance().apply {
-                    time = currentDate
-                    add(Calendar.MONTH, guaranteePeriod)
-                }.time
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                val formattedEndDate = dateFormat.format(guaranteeEndDate)
+                try {
+                    val serialNumber = serialNumberStr.toInt()
+                    val consumption = consumptionStr.toInt()
+                    val roomId = dbManager.getRoomIdByName(room)
 
-                // Agregar el dispositivo a la base de datos
-                dbManager.addDevice(description, type, brand, serialNumber, consumption, room, formattedEndDate, currentUser)
-                associatedDevicesList.add("$description ($type, $brand, $serialNumber, Consumo: $consumption, Aposento: $room, Garantía: $formattedEndDate)")
-                binding.associatedDevicesTextView.text = associatedDevicesList.joinToString("\n")
+                    // Calcular la fecha de garantía
+                    val currentDate = Date()
+                    val guaranteePeriod = getGuaranteePeriodForType(type)
+                    val guaranteeEndDate = Calendar.getInstance().apply {
+                        time = currentDate
+                        add(Calendar.MONTH, guaranteePeriod)
+                    }.time
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val formattedEndDate = dateFormat.format(guaranteeEndDate)
 
-                // Limpiar los campos de texto
-                binding.deviceDescriptionEditText.text.clear()
-                binding.deviceTypeEditText.text.clear()
-                binding.deviceBrandEditText.text.clear()
-                binding.deviceSerialEditText.text.clear()
-                binding.deviceConsumptionEditText.text.clear()
-                binding.deviceRoomEditText.text.clear()
+                    // Agregar el dispositivo a la base de datos
+                    dbManager.addDevice(description, type, brand, serialNumber, consumption, roomId, currentUser)
+                    associatedDevicesList.add("$description ($type, $brand, $serialNumber, Consumo: $consumption, Aposento: $room, Garantía: $formattedEndDate)")
+                    binding.associatedDevicesTextView.text = associatedDevicesList.joinToString("\n")
 
-                // Mostrar mensaje de éxito
-                Toast.makeText(this, "Dispositivo asociado exitosamente", Toast.LENGTH_SHORT).show()
+                    // Limpiar los campos de texto
+                    binding.deviceDescriptionEditText.text.clear()
+                    binding.deviceTypeEditText.text.clear()
+                    binding.deviceBrandEditText.text.clear()
+                    binding.deviceSerialEditText.text.clear()
+                    binding.deviceConsumptionEditText.text.clear()
+                    binding.deviceRoomEditText.text.clear()
+
+                    // Mostrar mensaje de éxito
+                    Toast.makeText(this, "Dispositivo asociado exitosamente", Toast.LENGTH_SHORT).show()
+                } catch (e: NumberFormatException) {
+                    Toast.makeText(this, "Número de serie y consumo deben ser números enteros", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -81,4 +89,4 @@ class AssociateDeviceActivity : AppCompatActivity() {
         }
     }
 }
-*/
+

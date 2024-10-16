@@ -1,6 +1,7 @@
 package com.example.samrthometec
 
 import android.os.Bundle
+import android.content.Intent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.samrthometec.databinding.ActivityAposentosBinding
@@ -55,7 +56,13 @@ class Aposentos : AppCompatActivity() {
                 }
             }
         }
+        binding.homebutton.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.putExtra("username", currentUser)
+            startActivity(intent)
+        }
     }
+
     private fun loadAposentos() {
         aposentosList.clear()
         aposentosList.addAll(dbManager.getAposentosByUser(currentUser))

@@ -396,5 +396,22 @@ class DatabaseManager(private val context: Context) {
         }
         return devicesList
     }
+    fun getRoomIdByName(roomName: String): Int {
+        val db = dbHelper.readableDatabase
+        var roomId = -1
+        try {
+            val cursor = db.rawQuery("SELECT ID FROM Aposentos WHERE Nombre = ?", arrayOf(roomName))
+            if (cursor.moveToFirst()) {
+                roomId = cursor.getInt(0)
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching room ID: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return roomId
+    }
+
 
 }

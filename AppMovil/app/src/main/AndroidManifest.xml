@@ -39,7 +39,9 @@
 
          <activity android:name=".Login" android:exported="false" />
          <activity android:name=".Registro" android:exported="false" />
-         <activity android:name=".Aposentos" android:exported="true"/> -->
-      </application>
+         <activity android:name=".Aposentos" android:exported="true"/>
+        <activity android:name=".HomeActivity" android:exported="true"/>
+        <activity android:name=".AssociateDeviceActivity" android:exported="true"/>
+    </application>
 
   </manifest>
