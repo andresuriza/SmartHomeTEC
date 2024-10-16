@@ -10,18 +10,32 @@
         android:theme="@style/Theme.SamrtHomeTec">  <!-- Nota: Asegúrate de corregir el typo -->
 
         <!-- Definir MainActivity como la actividad principal (launcher) -->
-        <activity
+       <activity
             android:name=".MainActivity"
-            android:exported="true">  <!-- MainActivity es accesible desde otras apps como actividad inicial -->
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Otras actividades -->
-        <activity android:name=".Login" android:exported="false" />
-        <activity android:name=".Registro" android:exported="false" />
-    </application>
+        <!--  <activity
+              android:name=".Aposentos"
+              android:exported="true">
+              <intent-filter>
 
-</manifest>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>-->
+
+        <!-- Otras actividades -->
+        <!-- <activity android:name=".MainActivity" android:exported="true" />-->
+
+
+         <activity android:name=".Login" android:exported="false" />
+         <activity android:name=".Registro" android:exported="false" />
+         <activity android:name=".Aposentos" android:exported="true"/> -->
+      </application>
+
+  </manifest>

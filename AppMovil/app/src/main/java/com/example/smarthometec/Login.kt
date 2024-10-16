@@ -42,8 +42,11 @@ class Login : AppCompatActivity() {
             if (checkUser(username, password)) {
                 // Mostrar un mensaje de éxito y redirigir
                 Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, Aposentos::class.java)
+                intent.putExtra("username", username)
                 // Aquí puedes redirigir a otra actividad si el login es exitoso
                 // startActivity(Intent(this, HomeActivity::class.java))
+                startActivity(intent)
             } else {
                 // Mostrar un mensaje de error
                 Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show()
