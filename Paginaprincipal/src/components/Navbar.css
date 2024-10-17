@@ -3,22 +3,22 @@
   background-color: #00796b; /* Fondo verde azulado */
   height: 80px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Espacio entre el logo y el menú */
+  align-items: center; /* Centrado vertical */
   font-size: 1.2rem;
   position: sticky;
   top: 0;
   z-index: 999;
-  padding: 0 40px;
+  padding: 0 20px; /* Ajustar el espaciado interno */
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra ligera */
 }
 
 .navbar-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Espacio entre el logo y el menú */
+  align-items: center; /* Centrado vertical */
   width: 100%;
-  max-width: 1400px;
+  max-width: 2000; /* Ancho máximo */
 }
 
 .navbar-logo {
@@ -28,16 +28,16 @@
   font-size: 2.2rem;
   font-weight: bold;
   display: flex;
-  align-items: center;
+  align-items: center; /* Centrado vertical */
 }
 
 /* Menú */
 .nav-menu {
   display: flex;
   list-style: none;
-  justify-content: flex-end;
-  width: 100%;
-  margin-right: 2rem;
+  justify-content: flex-start; /* Alinear a la izquierda */
+  width: auto; /* Ajustar ancho */
+  margin: 0; /* Eliminar margen */
 }
 
 .nav-links {
@@ -64,7 +64,7 @@
   cursor: pointer;
   font-size: 24px;
   color: white;
-  margin-right: 20px;
+  margin-left: 20px; /* Espacio a la izquierda del icono */
   display: flex;
   align-items: center; /* Centrado verticalmente */
   height: 80px; /* Asegura que el ícono esté alineado con el resto */

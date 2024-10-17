@@ -44,7 +44,7 @@ namespace Proyecto1.Controllers
         public async Task<ActionResult<UserDetailsDto>> GetUserDetails(int id)
         {
             var user = await _context.Users
-                .Include(u => u.DireccionesEntrega) // Incluir las direcciones de entrega
+                .Include(u => u.DireccionesEntrega)
                 .Where(u => u.Id == id)
                 .Select(u => new UserDetailsDto
                 {
@@ -149,9 +149,50 @@ namespace Proyecto1.Controllers
             return Ok(new { message = "Login exitoso", userId = user.Id, nombre = user.Nombre });
         }
 
-        // DELETE: api/Users/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        // PUT: api/Users/{id}/updateProfile
+        [HttpPut("{id}/updateProfile")]
+        public async Task<IActionResult> UpdateProfile(int id, [FromBody] UpdateProfileDto updatedProfile)
+        {
+            if (updatedProfile == null)
+            {
+                return BadRequest("Datos del perfil no proporcionados.");
+            }
+
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            // Actualizar solo las propiedades permitidas
+            user.Nombre = updatedProfile.Nombre;
+            user.Apellidos = updatedProfile.Apellidos;
+            user.Region = updatedProfile.Region;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return NoContent(); // Devuelve 204 No Content si la actualización fue exitosa
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound("Usuario no encontrado al intentar actualizar.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+
+
+
+        // PUT: api/Users/{id}/updatePassword
+        [HttpPut("{id}/updatePassword")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] UpdatePasswordDto passwordDto)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -159,7 +200,71 @@ namespace Proyecto1.Controllers
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
+            if (user.Contrasena != passwordDto.CurrentPassword)
+            {
+                return BadRequest(new { message = "La contraseña actual es incorrecta." });
+            }
+
+            user.Contrasena = passwordDto.NewPassword;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // POST: api/Users/{id}/addAddress
+        [HttpPost("{id}/addAddress")]
+        public async Task<ActionResult<DireccionEntrega>> AddAddress(int id, [FromBody] DireccionEntrega direccionEntrega)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            direccionEntrega.UserId = id;
+            _context.DireccionesEntrega.Add(direccionEntrega);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetUserDetails", new { id = user.Id }, direccionEntrega);
+        }
+
+        // PUT: api/Users/{id}/updateAddress/{addressId}
+        [HttpPut("{id}/updateAddress/{addressId}")]
+        public async Task<IActionResult> UpdateAddress(int id, int addressId, [FromBody] DireccionEntrega direccionEntrega)
+        {
+            if (direccionEntrega.Id != addressId)
+            {
+                return BadRequest();
+            }
+
+            var address = await _context.DireccionesEntrega.FindAsync(addressId);
+            if (address == null || address.UserId != id)
+            {
+                return NotFound();
+            }
+
+            address.Calle = direccionEntrega.Calle;
+            address.Ciudad = direccionEntrega.Ciudad;
+            address.CodigoPostal = direccionEntrega.CodigoPostal;
+            address.Pais = direccionEntrega.Pais;
+
+            _context.Entry(address).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/Users/{id}/deleteAddress/{addressId}
+        [HttpDelete("{id}/deleteAddress/{addressId}")]
+        public async Task<IActionResult> DeleteAddress(int id, int addressId)
+        {
+            var address = await _context.DireccionesEntrega.FindAsync(addressId);
+            if (address == null || address.UserId != id)
+            {
+                return NotFound();
+            }
+
+            _context.DireccionesEntrega.Remove(address);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -176,6 +281,12 @@ namespace Proyecto1.Controllers
     {
         public string Email { get; set; }
         public string Password { get; set; }
+    }
+    public class UpdateProfileDto
+    {
+        public string Nombre { get; set; }
+        public string Apellidos { get; set; }
+        public string Region { get; set; }
     }
 
     // DTO para los detalles del usuario
@@ -196,5 +307,12 @@ namespace Proyecto1.Controllers
         public string Ciudad { get; set; }
         public string CodigoPostal { get; set; }
         public string Pais { get; set; }
+    }
+
+    // DTO para actualizar la contraseña
+    public class UpdatePasswordDto
+    {
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
     }
 }

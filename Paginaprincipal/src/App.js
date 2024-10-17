@@ -1,5 +1,7 @@
 import React from "react";
 import "./App.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/pages/Home";
@@ -12,6 +14,7 @@ import ManageStore from "./components/pages/ManageStore";
 import { AuthProvider } from "./AuthContext"; // Importa el AuthProvider
 import ProfileManagement from "./components/pages/ProfileManagement";
 import DeviceReports from "./components/pages/DeviceReports";
+import UserProfilePage from './components/pages/UserProfilePage';
 
 function App() {
   return (
@@ -29,6 +32,7 @@ function App() {
             <Route path="/gestionar-tienda" element={<ManageStore />} />
             <Route path="/profile" element={<ProfileManagement />} />
             <Route path="/reports" element={<DeviceReports />} />
+            <Route path="/user-profile" element={UserProfilePage} />
           </Routes>
         </Router>
       </AuthProvider>

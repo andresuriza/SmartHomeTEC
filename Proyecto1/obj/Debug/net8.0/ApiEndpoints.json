@@ -955,14 +955,50 @@
   },
   {
     "ContainingType": "Proyecto1.Controllers.UsersController",
-    "Method": "DeleteUser",
-    "RelativePath": "api/Users/{id}",
+    "Method": "AddAddress",
+    "RelativePath": "api/Users/{id}/addAddress",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "direccionEntrega",
+        "Type": "DireccionEntrega",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "DireccionEntrega",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.UsersController",
+    "Method": "DeleteAddress",
+    "RelativePath": "api/Users/{id}/deleteAddress/{addressId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "addressId",
         "Type": "System.Int32",
         "IsRequired": true
       }
@@ -994,6 +1030,74 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.UsersController",
+    "Method": "UpdateAddress",
+    "RelativePath": "api/Users/{id}/updateAddress/{addressId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "addressId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "direccionEntrega",
+        "Type": "DireccionEntrega",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.UsersController",
+    "Method": "UpdatePassword",
+    "RelativePath": "api/Users/{id}/updatePassword",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "passwordDto",
+        "Type": "Proyecto1.Controllers.UpdatePasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.UsersController",
+    "Method": "UpdateProfile",
+    "RelativePath": "api/Users/{id}/updateProfile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "updatedProfile",
+        "Type": "Proyecto1.Controllers.UpdateProfileDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "Proyecto1.Controllers.UsersController",
