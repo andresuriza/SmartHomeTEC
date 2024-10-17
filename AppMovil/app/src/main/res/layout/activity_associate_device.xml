@@ -20,12 +20,19 @@
         android:minHeight="48dp"
         android:hint="Tipo de dispositivo" />
 
-    <EditText
+    <Spinner
+        android:id="@+id/brandSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:spinnerMode="dropdown" />
+
+    <!--<EditText
         android:id="@+id/deviceBrandEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:hint="Marca del dispositivo" />
+        android:hint="Marca del dispositivo" />-->
 
     <EditText
         android:id="@+id/deviceSerialEditText"
@@ -39,15 +46,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:hint="Consumo del dispositivo" />
+        android:hint="Consumo del dispositivo(W)" />
 
 
-    <EditText
+  <!--  <EditText
         android:id="@+id/deviceRoomEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Aposento donde se ubicará"
-        android:minHeight="48dp" />
+        android:minHeight="48dp" />-->
+
+    <Spinner
+        android:id="@+id/roomSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:spinnerMode="dropdown" />
+
 
     <Button
         android:id="@+id/associateDeviceButton"
@@ -58,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/deviceRoomEditText" />
+        app:layout_constraintTop_toBottomOf="@id/roomSpinner" />
 
     <TextView
         android:id="@+id/associatedDevicesTextView"
