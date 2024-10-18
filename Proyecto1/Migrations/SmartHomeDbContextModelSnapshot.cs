@@ -56,47 +56,6 @@ namespace Proyecto1.Migrations
                     b.ToTable("DireccionesEntrega");
                 });
 
-            modelBuilder.Entity("Dispositivo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("ConsumoElectrico")
-                        .HasColumnType("numeric");
-
-                    b.Property<int?>("DistribuidorId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Marca")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("NumeroSerie")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("TipoDispositivoId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DistribuidorId");
-
-                    b.HasIndex("NumeroSerie")
-                        .IsUnique();
-
-                    b.HasIndex("TipoDispositivoId");
-
-                    b.ToTable("Dispositivos");
-                });
-
             modelBuilder.Entity("Proyecto1.Models.CertificadoGarantia", b =>
                 {
                     b.Property<int>("Id")
@@ -105,8 +64,9 @@ namespace Proyecto1.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DispositivoId")
-                        .HasColumnType("integer");
+                    b.Property<string>("DispositivoNumeroSerie")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("FechaCompra")
                         .HasColumnType("timestamp with time zone");
@@ -119,11 +79,41 @@ namespace Proyecto1.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DispositivoId");
+                    b.HasIndex("DispositivoNumeroSerie");
 
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("CertificadosGarantia");
+                });
+
+            modelBuilder.Entity("Proyecto1.Models.Dispositivo", b =>
+                {
+                    b.Property<string>("NumeroSerie")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("ConsumoElectrico")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("DistribuidorCedulaJuridica")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TipoDispositivoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("NumeroSerie");
+
+                    b.HasIndex("DistribuidorCedulaJuridica");
+
+                    b.HasIndex("NumeroSerie")
+                        .IsUnique();
+
+                    b.HasIndex("TipoDispositivoId");
+
+                    b.ToTable("Dispositivos");
                 });
 
             modelBuilder.Entity("Proyecto1.Models.DispositivoUsuario", b =>
@@ -131,8 +121,8 @@ namespace Proyecto1.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("DispositivoId")
-                        .HasColumnType("integer");
+                    b.Property<string>("DispositivoNumeroSerie")
+                        .HasColumnType("text");
 
                     b.Property<string>("Aposento")
                         .IsRequired()
@@ -147,23 +137,16 @@ namespace Proyecto1.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("integer");
 
-                    b.HasKey("UserId", "DispositivoId");
+                    b.HasKey("UserId", "DispositivoNumeroSerie");
 
-                    b.HasIndex("DispositivoId");
+                    b.HasIndex("DispositivoNumeroSerie");
 
                     b.ToTable("DispositivosUsuarios");
                 });
 
             modelBuilder.Entity("Proyecto1.Models.Distribuidor", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<string>("CedulaJuridica")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Nombre")
@@ -174,7 +157,7 @@ namespace Proyecto1.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("CedulaJuridica");
 
                     b.ToTable("Distribuidores");
                 });
@@ -187,8 +170,9 @@ namespace Proyecto1.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NumeroFactura"));
 
-                    b.Property<int>("DispositivoId")
-                        .HasColumnType("integer");
+                    b.Property<string>("DispositivoNumeroSerie")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("FechaCompra")
                         .HasColumnType("timestamp with time zone");
@@ -201,7 +185,7 @@ namespace Proyecto1.Migrations
 
                     b.HasKey("NumeroFactura");
 
-                    b.HasIndex("DispositivoId");
+                    b.HasIndex("DispositivoNumeroSerie");
 
                     b.HasIndex("UsuarioId");
 
@@ -213,15 +197,15 @@ namespace Proyecto1.Migrations
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("DispositivoId")
-                        .HasColumnType("integer");
+                    b.Property<string>("DispositivoNumeroSerie")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("FechaTransferencia")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("UsuarioId", "DispositivoId", "FechaTransferencia");
+                    b.HasKey("UsuarioId", "DispositivoNumeroSerie", "FechaTransferencia");
 
-                    b.HasIndex("DispositivoId");
+                    b.HasIndex("DispositivoNumeroSerie");
 
                     b.ToTable("HistorialUsuariosDispositivos");
                 });
@@ -234,8 +218,9 @@ namespace Proyecto1.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DispositivoId")
-                        .HasColumnType("integer");
+                    b.Property<string>("DispositivoNumeroSerie")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("FechaHora")
                         .HasColumnType("timestamp with time zone");
@@ -251,14 +236,47 @@ namespace Proyecto1.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DispositivoId");
+                    b.HasIndex("DispositivoNumeroSerie");
 
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Pedidos");
                 });
 
-            modelBuilder.Entity("TipoDispositivo", b =>
+            modelBuilder.Entity("Proyecto1.Models.Producto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DistribuidorCedula")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NumeroSerieDispositivo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Precio")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DistribuidorCedula");
+
+                    b.HasIndex("NumeroSerieDispositivo")
+                        .IsUnique();
+
+                    b.ToTable("Productos");
+                });
+
+            modelBuilder.Entity("Proyecto1.Models.TipoDispositivo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -327,26 +345,11 @@ namespace Proyecto1.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Dispositivo", b =>
-                {
-                    b.HasOne("Proyecto1.Models.Distribuidor", null)
-                        .WithMany("Dispositivos")
-                        .HasForeignKey("DistribuidorId");
-
-                    b.HasOne("TipoDispositivo", "TipoDispositivo")
-                        .WithMany("Dispositivos")
-                        .HasForeignKey("TipoDispositivoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("TipoDispositivo");
-                });
-
             modelBuilder.Entity("Proyecto1.Models.CertificadoGarantia", b =>
                 {
-                    b.HasOne("Dispositivo", "Dispositivo")
+                    b.HasOne("Proyecto1.Models.Dispositivo", "Dispositivo")
                         .WithMany()
-                        .HasForeignKey("DispositivoId")
+                        .HasForeignKey("DispositivoNumeroSerie")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -361,11 +364,26 @@ namespace Proyecto1.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("Proyecto1.Models.Dispositivo", b =>
+                {
+                    b.HasOne("Proyecto1.Models.Distribuidor", null)
+                        .WithMany("Dispositivos")
+                        .HasForeignKey("DistribuidorCedulaJuridica");
+
+                    b.HasOne("Proyecto1.Models.TipoDispositivo", "TipoDispositivo")
+                        .WithMany("Dispositivos")
+                        .HasForeignKey("TipoDispositivoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("TipoDispositivo");
+                });
+
             modelBuilder.Entity("Proyecto1.Models.DispositivoUsuario", b =>
                 {
-                    b.HasOne("Dispositivo", "Dispositivo")
+                    b.HasOne("Proyecto1.Models.Dispositivo", "Dispositivo")
                         .WithMany("DispositivosUsuarios")
-                        .HasForeignKey("DispositivoId")
+                        .HasForeignKey("DispositivoNumeroSerie")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -382,9 +400,9 @@ namespace Proyecto1.Migrations
 
             modelBuilder.Entity("Proyecto1.Models.Factura", b =>
                 {
-                    b.HasOne("Dispositivo", "Dispositivo")
+                    b.HasOne("Proyecto1.Models.Dispositivo", "Dispositivo")
                         .WithMany("Facturas")
-                        .HasForeignKey("DispositivoId")
+                        .HasForeignKey("DispositivoNumeroSerie")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -401,9 +419,9 @@ namespace Proyecto1.Migrations
 
             modelBuilder.Entity("Proyecto1.Models.HistorialUsuariosDispositivos", b =>
                 {
-                    b.HasOne("Dispositivo", "Dispositivo")
+                    b.HasOne("Proyecto1.Models.Dispositivo", "Dispositivo")
                         .WithMany()
-                        .HasForeignKey("DispositivoId")
+                        .HasForeignKey("DispositivoNumeroSerie")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -420,9 +438,9 @@ namespace Proyecto1.Migrations
 
             modelBuilder.Entity("Proyecto1.Models.Pedido", b =>
                 {
-                    b.HasOne("Dispositivo", "Dispositivo")
+                    b.HasOne("Proyecto1.Models.Dispositivo", "Dispositivo")
                         .WithMany("Pedidos")
-                        .HasForeignKey("DispositivoId")
+                        .HasForeignKey("DispositivoNumeroSerie")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -437,13 +455,34 @@ namespace Proyecto1.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("Dispositivo", b =>
+            modelBuilder.Entity("Proyecto1.Models.Producto", b =>
+                {
+                    b.HasOne("Proyecto1.Models.Distribuidor", "Distribuidor")
+                        .WithMany()
+                        .HasForeignKey("DistribuidorCedula")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Proyecto1.Models.Dispositivo", "Dispositivo")
+                        .WithOne("Producto")
+                        .HasForeignKey("Proyecto1.Models.Producto", "NumeroSerieDispositivo")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Dispositivo");
+
+                    b.Navigation("Distribuidor");
+                });
+
+            modelBuilder.Entity("Proyecto1.Models.Dispositivo", b =>
                 {
                     b.Navigation("DispositivosUsuarios");
 
                     b.Navigation("Facturas");
 
                     b.Navigation("Pedidos");
+
+                    b.Navigation("Producto");
                 });
 
             modelBuilder.Entity("Proyecto1.Models.Distribuidor", b =>
@@ -451,7 +490,7 @@ namespace Proyecto1.Migrations
                     b.Navigation("Dispositivos");
                 });
 
-            modelBuilder.Entity("TipoDispositivo", b =>
+            modelBuilder.Entity("Proyecto1.Models.TipoDispositivo", b =>
                 {
                     b.Navigation("Dispositivos");
                 });

@@ -192,7 +192,7 @@ export default function ProfileManagement() {
     }
   };
 
-  const handleProfileSubmit = async (e) => {
+const handleProfileSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await fetch(`https://localhost:5555/api/users/${user.userId}/updateProfile`, {

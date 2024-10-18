@@ -1,4 +1,6 @@
-﻿namespace Proyecto1.Models
+﻿using System;
+
+namespace Proyecto1.Models
 {
     public class CertificadoGarantia
     {
@@ -9,8 +11,8 @@
         public int UsuarioId { get; set; }
         public User Usuario { get; set; }
 
-        public int DispositivoId { get; set; }
+        // Cambiar DispositivoId a tipo string y renombrar la propiedad
+        public string DispositivoNumeroSerie { get; set; } // Cambiado de DispositivoId a DispositivoNumeroSerie
         public Dispositivo Dispositivo { get; set; }
     }
-
 }

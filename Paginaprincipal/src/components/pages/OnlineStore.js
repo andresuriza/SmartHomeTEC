@@ -1,87 +1,108 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; 
+import { useLocation, useNavigate } from 'react-router-dom'; 
+import { useAuth } from "../../AuthContext"; 
 import './OnlineStore.css';
 
 function OnlineStore() {
   const location = useLocation();
-  const userRegion = location.state?.userRegion || 'América'; 
-
-  const [devices, setDevices] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const navigate = useNavigate(); 
+  const { user } = useAuth(); 
+  const [userRegion, setUserRegion] = useState(''); 
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
+  const [regionFetched, setRegionFetched] = useState(false); 
 
   useEffect(() => {
-    // Hacer la llamada a la API para obtener los dispositivos
-    const fetchDevices = async () => {
-      try {
-        const response = await fetch('https://localhost:5555/api/Dispositivos');
-        const data = await response.json();
-        setDevices(data);
-      } catch (error) {
-        console.error('Error al obtener dispositivos:', error);
+    const fetchUserRegion = async () => {
+      console.log("Intentando obtener la región del usuario...");
+      if (user && user.userId) {
+        try {
+          const response = await fetch(`https://localhost:5555/api/users/${user.userId}/details`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
+            },
+          });
+
+          const data = await response.json();
+          console.log("Respuesta de la API:", data);
+
+          if (response.ok) {
+            setUserRegion(data.region); 
+            setRegionFetched(true); 
+            console.log("Región obtenida:", data.region);
+            
+            // Adjuntar la función a window para que sea accesible desde la consola
+            window.getUserRegion = () => console.log("Región del usuario:", data.region);
+          } else {
+            setError(data.message || "Error al obtener los detalles del usuario");
+            setRegionFetched(false);
+          }
+        } catch (error) {
+          console.error("Error al conectarse con la API:", error);
+          setError("Error al conectarse con la API");
+          setRegionFetched(false);
+        }
       }
     };
 
-    fetchDevices();
-  }, []);
+    fetchUserRegion(); 
+  }, [user]);
 
-  // Filtrar los dispositivos disponibles según la región del usuario
-  const filteredDevices = devices.filter(
-    (device) => device.region === userRegion
-  );
+  useEffect(() => {
+    const fetchProductos = async () => {
+      if (userRegion) {
+        try {
+          const response = await fetch(`https://localhost:5555/api/Producto/por-region/${userRegion}`); // Llamada actualizada para filtrar por región
+          if (!response.ok) throw new Error('Error al obtener productos');
+          const data = await response.json();
+          setProductos(data);
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
 
-  const handleDeviceSelect = (device) => {
-    setSelectedDevice(device);
-  };
+    fetchProductos();
+  }, [userRegion]); // Dependencia de userRegion para llamar cuando cambia
 
-  const handleOrderConfirm = () => {
-    if (selectedDevice) {
-      setOrderConfirmed(true);
-      alert('Pedido confirmado. Se ha enviado la factura y certificado a su correo electrónico.');
-    } else {
-      alert('Por favor, seleccione un dispositivo.');
-    }
+  const handleProductoSelect = (producto) => {
+    navigate(`/producto/${producto.id}`);
   };
 
   return (
     <div className="store-container">
       <h1>Tienda en línea</h1>
-      <p>Seleccione un dispositivo para comprar según su región: <strong>{userRegion}</strong></p>
+      {regionFetched ? (
+        <p>Seleccione un producto para comprar: <strong>{userRegion || 'No disponible'}</strong></p>
+      ) : (
+        <p>Obteniendo región del usuario...</p>
+      )}
+
+      {loading && <p>Cargando productos...</p>}
+      {error && <p>Error: {error}</p>}
 
       <div className="device-list">
-        {filteredDevices.length > 0 ? (
-          filteredDevices.map((device) => (
+        {productos.length > 0 ? (
+          productos.map((producto) => (
             <div
-              key={device.id}
-              className={`device-item ${selectedDevice && selectedDevice.id === device.id ? 'selected' : ''}`}
-              onClick={() => handleDeviceSelect(device)}
+              key={producto.id}
+              className="device-item"
+              onClick={() => handleProductoSelect(producto)}
             >
-              <h3>{device.tipoDispositivo.nombre}</h3> {/* Mostrar el tipo de dispositivo */}
-              <p>Marca: {device.marca}</p>
-              <p>Precio: ${device.precio}</p> {/* Asumiendo que tienes un campo 'precio' */}
-              <p>Garantía: {device.tipoDispositivo.tiempoGarantia} años</p> {/* Mostrar el tiempo de garantía del tipo de dispositivo */}
-              <p>Número de serie: {device.numeroSerie}</p>
+              <h3>{producto.nombre}</h3>
+              <p>Precio: ${producto.precio}</p>
+              <p>Número de serie: {producto.numeroSerieDispositivo}</p>
             </div>
           ))
         ) : (
-          <p>No hay dispositivos disponibles para su región en este momento.</p>
+          <p>No hay productos disponibles en este momento.</p>
         )}
       </div>
-
-      <button onClick={handleOrderConfirm} className="btn-confirm">
-        Confirmar Pedido
-      </button>
-
-      {orderConfirmed && selectedDevice && (
-        <div className="order-details">
-          <h2>Detalles del Pedido</h2>
-          <p><strong>Dispositivo:</strong> {selectedDevice.tipoDispositivo.nombre}</p>
-          <p><strong>Marca:</strong> {selectedDevice.marca}</p>
-          <p><strong>Número de Serie:</strong> {selectedDevice.numeroSerie}</p>
-          <p><strong>Precio:</strong> ${selectedDevice.precio}</p>
-          <p><strong>Garantía:</strong> {selectedDevice.tipoDispositivo.tiempoGarantia} años</p>
-        </div>
-      )}
     </div>
   );
 }

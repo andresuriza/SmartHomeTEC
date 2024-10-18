@@ -25,12 +25,12 @@ namespace Proyecto1.Controllers
             return await _context.HistorialUsuariosDispositivos.ToListAsync();
         }
 
-        // GET: api/HistorialUsuariosDispositivos/5
-        [HttpGet("{UsuarioId}/{DispositivoId}")]
-        public async Task<ActionResult<HistorialUsuariosDispositivos>> GetHistorial(int UsuarioId, int DispositivoId)
+        // GET: api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoNumeroSerie}
+        [HttpGet("{UsuarioId}/{DispositivoNumeroSerie}")]
+        public async Task<ActionResult<HistorialUsuariosDispositivos>> GetHistorial(int UsuarioId, string DispositivoNumeroSerie)
         {
             var historial = await _context.HistorialUsuariosDispositivos
-                .FirstOrDefaultAsync(h => h.UsuarioId == UsuarioId && h.DispositivoId == DispositivoId);
+                .FirstOrDefaultAsync(h => h.UsuarioId == UsuarioId && h.DispositivoNumeroSerie == DispositivoNumeroSerie);
 
             if (historial == null)
             {
@@ -47,14 +47,14 @@ namespace Proyecto1.Controllers
             _context.HistorialUsuariosDispositivos.Add(historial);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetHistorial", new { UsuarioId = historial.UsuarioId, DispositivoId = historial.DispositivoId }, historial);
+            return CreatedAtAction("GetHistorial", new { UsuarioId = historial.UsuarioId, DispositivoNumeroSerie = historial.DispositivoNumeroSerie }, historial);
         }
 
-        // PUT: api/HistorialUsuariosDispositivos/5
-        [HttpPut("{UsuarioId}/{DispositivoId}")]
-        public async Task<IActionResult> PutHistorial(int UsuarioId, int DispositivoId, HistorialUsuariosDispositivos historial)
+        // PUT: api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoNumeroSerie}
+        [HttpPut("{UsuarioId}/{DispositivoNumeroSerie}")]
+        public async Task<IActionResult> PutHistorial(int UsuarioId, string DispositivoNumeroSerie, HistorialUsuariosDispositivos historial)
         {
-            if (UsuarioId != historial.UsuarioId || DispositivoId != historial.DispositivoId)
+            if (UsuarioId != historial.UsuarioId || DispositivoNumeroSerie != historial.DispositivoNumeroSerie)
             {
                 return BadRequest();
             }
@@ -67,7 +67,7 @@ namespace Proyecto1.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!HistorialExists(UsuarioId, DispositivoId))
+                if (!HistorialExists(UsuarioId, DispositivoNumeroSerie))
                 {
                     return NotFound();
                 }
@@ -80,12 +80,12 @@ namespace Proyecto1.Controllers
             return NoContent();
         }
 
-        // DELETE: api/HistorialUsuariosDispositivos/5
-        [HttpDelete("{UsuarioId}/{DispositivoId}")]
-        public async Task<IActionResult> DeleteHistorial(int UsuarioId, int DispositivoId)
+        // DELETE: api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoNumeroSerie}
+        [HttpDelete("{UsuarioId}/{DispositivoNumeroSerie}")]
+        public async Task<IActionResult> DeleteHistorial(int UsuarioId, string DispositivoNumeroSerie)
         {
             var historial = await _context.HistorialUsuariosDispositivos
-                .FirstOrDefaultAsync(h => h.UsuarioId == UsuarioId && h.DispositivoId == DispositivoId);
+                .FirstOrDefaultAsync(h => h.UsuarioId == UsuarioId && h.DispositivoNumeroSerie == DispositivoNumeroSerie);
 
             if (historial == null)
             {
@@ -98,9 +98,9 @@ namespace Proyecto1.Controllers
             return NoContent();
         }
 
-        private bool HistorialExists(int UsuarioId, int DispositivoId)
+        private bool HistorialExists(int UsuarioId, string DispositivoNumeroSerie)
         {
-            return _context.HistorialUsuariosDispositivos.Any(h => h.UsuarioId == UsuarioId && h.DispositivoId == DispositivoId);
+            return _context.HistorialUsuariosDispositivos.Any(h => h.UsuarioId == UsuarioId && h.DispositivoNumeroSerie == DispositivoNumeroSerie);
         }
     }
 }

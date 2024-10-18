@@ -27,6 +27,7 @@ export function AuthProvider({ children }) {
   // Función para cerrar sesión
   const logout = () => {
     localStorage.removeItem("user");
+    
     setUser(null);
     setLoggedIn(false);  // Actualizar el estado global de autenticación
   };

@@ -15,6 +15,7 @@ import { AuthProvider } from "./AuthContext"; // Importa el AuthProvider
 import ProfileManagement from "./components/pages/ProfileManagement";
 import DeviceReports from "./components/pages/DeviceReports";
 import UserProfilePage from './components/pages/UserProfilePage';
+import ProductDetails from './components/pages/ProductDetails';
 
 function App() {
   return (
@@ -29,10 +30,12 @@ function App() {
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/client" element={<ClientView />} />
             <Route path="/tienda" element={<OnlineStore />} />
+            <Route path="/producto/:id" element={<ProductDetails />} />
             <Route path="/gestionar-tienda" element={<ManageStore />} />
             <Route path="/profile" element={<ProfileManagement />} />
             <Route path="/reports" element={<DeviceReports />} />
             <Route path="/user-profile" element={UserProfilePage} />
+            
           </Routes>
         </Router>
       </AuthProvider>

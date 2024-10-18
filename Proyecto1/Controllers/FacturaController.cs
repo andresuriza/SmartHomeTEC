@@ -22,14 +22,17 @@ namespace Proyecto1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Factura>>> GetFacturas()
         {
-            return await _context.Facturas.ToListAsync();
+            // Incluye el Dispositivo relacionado al obtener las facturas
+            return await _context.Facturas.Include(f => f.Dispositivo).ToListAsync();
         }
 
         // GET: api/Factura/5
         [HttpGet("{NumeroFactura}")]
         public async Task<ActionResult<Factura>> GetFactura(int NumeroFactura)
         {
-            var factura = await _context.Facturas.FindAsync(NumeroFactura);
+            var factura = await _context.Facturas
+                .Include(f => f.Dispositivo) // Incluye el Dispositivo relacionado
+                .FirstOrDefaultAsync(f => f.NumeroFactura == NumeroFactura);
 
             if (factura == null)
             {
@@ -43,6 +46,12 @@ namespace Proyecto1.Controllers
         [HttpPost]
         public async Task<ActionResult<Factura>> PostFactura(Factura factura)
         {
+            // Asegúrate de que el DispositivoNumeroSerie esté asignado
+            if (string.IsNullOrEmpty(factura.DispositivoNumeroSerie))
+            {
+                return BadRequest("El número de serie del dispositivo es obligatorio.");
+            }
+
             _context.Facturas.Add(factura);
             await _context.SaveChangesAsync();
 

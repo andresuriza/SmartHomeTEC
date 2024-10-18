@@ -118,7 +118,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Dispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Models.Dispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -138,13 +138,13 @@
     "Parameters": [
       {
         "Name": "dispositivo",
-        "Type": "Dispositivo",
+        "Type": "Proyecto1.Models.Dispositivo",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "Dispositivo",
+        "Type": "Proyecto1.Models.Dispositivo",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -157,20 +157,20 @@
   {
     "ContainingType": "Proyecto1.Controllers.DispositivosController",
     "Method": "GetDispositivo",
-    "RelativePath": "api/Dispositivos/{id}",
+    "RelativePath": "api/Dispositivos/{numeroSerie}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
+        "Name": "numeroSerie",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "Dispositivo",
+        "Type": "Proyecto1.Models.Dispositivo",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -183,19 +183,19 @@
   {
     "ContainingType": "Proyecto1.Controllers.DispositivosController",
     "Method": "PutDispositivo",
-    "RelativePath": "api/Dispositivos/{id}",
+    "RelativePath": "api/Dispositivos/{numeroSerie}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
+        "Name": "numeroSerie",
+        "Type": "System.String",
         "IsRequired": true
       },
       {
         "Name": "dispositivo",
-        "Type": "Dispositivo",
+        "Type": "Proyecto1.Models.Dispositivo",
         "IsRequired": true
       }
     ],
@@ -204,18 +204,44 @@
   {
     "ContainingType": "Proyecto1.Controllers.DispositivosController",
     "Method": "DeleteDispositivo",
-    "RelativePath": "api/Dispositivos/{id}",
+    "RelativePath": "api/Dispositivos/{numeroSerie}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
+        "Name": "numeroSerie",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.DispositivosController",
+    "Method": "PostDispositivos",
+    "RelativePath": "api/Dispositivos/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dispositivos",
+        "Type": "System.Collections.Generic.List\u00601[[Proyecto1.Models.Dispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Models.Dispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "Proyecto1.Controllers.DispositivoUsuarioController",
@@ -375,14 +401,14 @@
   {
     "ContainingType": "Proyecto1.Controllers.DistribuidorController",
     "Method": "GetDistribuidor",
-    "RelativePath": "api/Distribuidor/{id}",
+    "RelativePath": "api/Distribuidor/{cedulaJuridica}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
+        "Name": "cedulaJuridica",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
@@ -401,14 +427,14 @@
   {
     "ContainingType": "Proyecto1.Controllers.DistribuidorController",
     "Method": "PutDistribuidor",
-    "RelativePath": "api/Distribuidor/{id}",
+    "RelativePath": "api/Distribuidor/{cedulaJuridica}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
+        "Name": "cedulaJuridica",
+        "Type": "System.String",
         "IsRequired": true
       },
       {
@@ -422,18 +448,44 @@
   {
     "ContainingType": "Proyecto1.Controllers.DistribuidorController",
     "Method": "DeleteDistribuidor",
-    "RelativePath": "api/Distribuidor/{id}",
+    "RelativePath": "api/Distribuidor/{cedulaJuridica}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
+        "Name": "cedulaJuridica",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.DistribuidorController",
+    "Method": "PostDistribuidores",
+    "RelativePath": "api/Distribuidor/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "distribuidores",
+        "Type": "System.Collections.Generic.List\u00601[[Proyecto1.Models.Distribuidor, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Models.Distribuidor, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "Proyecto1.Controllers.FacturaController",
@@ -593,7 +645,7 @@
   {
     "ContainingType": "Proyecto1.Controllers.HistorialUsuariosDispositivosController",
     "Method": "GetHistorial",
-    "RelativePath": "api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoId}",
+    "RelativePath": "api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoNumeroSerie}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -604,8 +656,8 @@
         "IsRequired": true
       },
       {
-        "Name": "DispositivoId",
-        "Type": "System.Int32",
+        "Name": "DispositivoNumeroSerie",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
@@ -624,7 +676,7 @@
   {
     "ContainingType": "Proyecto1.Controllers.HistorialUsuariosDispositivosController",
     "Method": "PutHistorial",
-    "RelativePath": "api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoId}",
+    "RelativePath": "api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoNumeroSerie}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -635,8 +687,8 @@
         "IsRequired": true
       },
       {
-        "Name": "DispositivoId",
-        "Type": "System.Int32",
+        "Name": "DispositivoNumeroSerie",
+        "Type": "System.String",
         "IsRequired": true
       },
       {
@@ -650,7 +702,7 @@
   {
     "ContainingType": "Proyecto1.Controllers.HistorialUsuariosDispositivosController",
     "Method": "DeleteHistorial",
-    "RelativePath": "api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoId}",
+    "RelativePath": "api/HistorialUsuariosDispositivos/{UsuarioId}/{DispositivoNumeroSerie}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -661,8 +713,8 @@
         "IsRequired": true
       },
       {
-        "Name": "DispositivoId",
-        "Type": "System.Int32",
+        "Name": "DispositivoNumeroSerie",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
@@ -778,6 +830,193 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "GetProductos",
+    "RelativePath": "api/Producto",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Controllers.ProductoDto, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "PostProducto",
+    "RelativePath": "api/Producto",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productoDto",
+        "Type": "Proyecto1.Controllers.ProductoCreationDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Proyecto1.Controllers.ProductoDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "GetProducto",
+    "RelativePath": "api/Producto/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Proyecto1.Controllers.ProductoDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "PutProducto",
+    "RelativePath": "api/Producto/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "producto",
+        "Type": "Proyecto1.Models.Producto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "DeleteProducto",
+    "RelativePath": "api/Producto/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "GetDispositivosRelacionados",
+    "RelativePath": "api/Producto/{id}/relacionados",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Controllers.ProductoDto, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "GetProductoConDetalles",
+    "RelativePath": "api/Producto/detalles/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Proyecto1.Controllers.ProductoDetallesDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.ProductoController",
+    "Method": "GetProductosPorRegion",
+    "RelativePath": "api/Producto/por-region/{region}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "region",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Controllers.ProductoDto, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "Proyecto1.Controllers.TipoDispositivoController",
     "Method": "GetTiposDispositivos",
     "RelativePath": "api/TipoDispositivo",
@@ -787,7 +1026,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[TipoDispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Models.TipoDispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -807,13 +1046,13 @@
     "Parameters": [
       {
         "Name": "tipoDispositivo",
-        "Type": "TipoDispositivo",
+        "Type": "Proyecto1.Models.TipoDispositivo",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "TipoDispositivo",
+        "Type": "Proyecto1.Models.TipoDispositivo",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -839,7 +1078,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "TipoDispositivo",
+        "Type": "Proyecto1.Models.TipoDispositivo",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -864,7 +1103,7 @@
       },
       {
         "Name": "tipoDispositivo",
-        "Type": "TipoDispositivo",
+        "Type": "Proyecto1.Models.TipoDispositivo",
         "IsRequired": true
       }
     ],
@@ -885,6 +1124,32 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Proyecto1.Controllers.TipoDispositivoController",
+    "Method": "PostTiposDispositivos",
+    "RelativePath": "api/TipoDispositivo/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tiposDispositivos",
+        "Type": "System.Collections.Generic.List\u00601[[Proyecto1.Models.TipoDispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Proyecto1.Models.TipoDispositivo, Proyecto1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "Proyecto1.Controllers.UsersController",

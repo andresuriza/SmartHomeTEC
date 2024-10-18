@@ -25,11 +25,11 @@ namespace Proyecto1.Controllers
             return await _context.Distribuidores.ToListAsync();
         }
 
-        // GET: api/Distribuidor/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Distribuidor>> GetDistribuidor(int id)
+        // GET: api/Distribuidor/{cedulaJuridica}
+        [HttpGet("{cedulaJuridica}")]
+        public async Task<ActionResult<Distribuidor>> GetDistribuidor(string cedulaJuridica)
         {
-            var distribuidor = await _context.Distribuidores.FindAsync(id);
+            var distribuidor = await _context.Distribuidores.FindAsync(cedulaJuridica);
 
             if (distribuidor == null)
             {
@@ -38,22 +38,52 @@ namespace Proyecto1.Controllers
 
             return distribuidor;
         }
+        // POST: api/Distribuidor/multiple
+        [HttpPost("multiple")]
+        public async Task<ActionResult<IEnumerable<Distribuidor>>> PostDistribuidores(List<Distribuidor> distribuidores)
+        {
+            if (distribuidores == null || !distribuidores.Any())
+            {
+                return BadRequest("La lista de distribuidores no puede estar vacía.");
+            }
+
+            foreach (var distribuidor in distribuidores)
+            {
+                // Verificar si la cédula jurídica ya existe
+                if (_context.Distribuidores.Any(d => d.CedulaJuridica == distribuidor.CedulaJuridica))
+                {
+                    return Conflict(new { message = $"La cédula jurídica {distribuidor.CedulaJuridica} ya está en uso." });
+                }
+            }
+
+            // Agregar todos los distribuidores a la base de datos
+            _context.Distribuidores.AddRange(distribuidores);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetDistribuidores", distribuidores);
+        }
 
         // POST: api/Distribuidor
         [HttpPost]
         public async Task<ActionResult<Distribuidor>> PostDistribuidor(Distribuidor distribuidor)
         {
+            // Verificar si la cédula jurídica ya existe
+            if (_context.Distribuidores.Any(d => d.CedulaJuridica == distribuidor.CedulaJuridica))
+            {
+                return Conflict(new { message = "La cédula jurídica ya está en uso." });
+            }
+
             _context.Distribuidores.Add(distribuidor);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDistribuidor", new { id = distribuidor.Id }, distribuidor);
+            return CreatedAtAction("GetDistribuidor", new { cedulaJuridica = distribuidor.CedulaJuridica }, distribuidor);
         }
 
-        // PUT: api/Distribuidor/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDistribuidor(int id, Distribuidor distribuidor)
+        // PUT: api/Distribuidor/{cedulaJuridica}
+        [HttpPut("{cedulaJuridica}")]
+        public async Task<IActionResult> PutDistribuidor(string cedulaJuridica, Distribuidor distribuidor)
         {
-            if (id != distribuidor.Id)
+            if (cedulaJuridica != distribuidor.CedulaJuridica)
             {
                 return BadRequest();
             }
@@ -66,7 +96,7 @@ namespace Proyecto1.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!DistribuidorExists(id))
+                if (!DistribuidorExists(cedulaJuridica))
                 {
                     return NotFound();
                 }
@@ -79,11 +109,11 @@ namespace Proyecto1.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Distribuidor/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDistribuidor(int id)
+        // DELETE: api/Distribuidor/{cedulaJuridica}
+        [HttpDelete("{cedulaJuridica}")]
+        public async Task<IActionResult> DeleteDistribuidor(string cedulaJuridica)
         {
-            var distribuidor = await _context.Distribuidores.FindAsync(id);
+            var distribuidor = await _context.Distribuidores.FindAsync(cedulaJuridica);
             if (distribuidor == null)
             {
                 return NotFound();
@@ -95,9 +125,9 @@ namespace Proyecto1.Controllers
             return NoContent();
         }
 
-        private bool DistribuidorExists(int id)
+        private bool DistribuidorExists(string cedulaJuridica)
         {
-            return _context.Distribuidores.Any(e => e.Id == id);
+            return _context.Distribuidores.Any(e => e.CedulaJuridica == cedulaJuridica);
         }
     }
 }

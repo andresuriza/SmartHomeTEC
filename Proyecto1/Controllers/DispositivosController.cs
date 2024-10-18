@@ -27,13 +27,13 @@ namespace Proyecto1.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Dispositivos/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Dispositivo>> GetDispositivo(int id)
+        // GET: api/Dispositivos/{numeroSerie}
+        [HttpGet("{numeroSerie}")]
+        public async Task<ActionResult<Dispositivo>> GetDispositivo(string numeroSerie)
         {
             var dispositivo = await _context.Dispositivos
                 .Include(d => d.TipoDispositivo) // Incluye los datos del TipoDispositivo relacionado
-                .FirstOrDefaultAsync(d => d.Id == id);
+                .FirstOrDefaultAsync(d => d.NumeroSerie == numeroSerie);
 
             if (dispositivo == null)
             {
@@ -60,28 +60,68 @@ namespace Proyecto1.Controllers
             _context.Dispositivos.Add(dispositivo);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDispositivo", new { id = dispositivo.Id }, dispositivo);
+            return CreatedAtAction("GetDispositivo", new { numeroSerie = dispositivo.NumeroSerie }, dispositivo);
+        }
+        // POST: api/Dispositivos/multiple
+        [HttpPost("multiple")]
+        public async Task<ActionResult<IEnumerable<Dispositivo>>> PostDispositivos(List<Dispositivo> dispositivos)
+        {
+            if (dispositivos == null || !dispositivos.Any())
+            {
+                return BadRequest("La lista de dispositivos no puede estar vacía.");
+            }
+
+            foreach (var dispositivo in dispositivos)
+            {
+                // Validar si el TipoDispositivoId existe
+                var tipoDispositivo = await _context.TiposDispositivos.FindAsync(dispositivo.TipoDispositivoId);
+                if (tipoDispositivo == null)
+                {
+                    return BadRequest(new { message = $"El TipoDispositivoId {dispositivo.TipoDispositivoId} no existe." });
+                }
+
+                // Asignar el TipoDispositivo encontrado al dispositivo
+                dispositivo.TipoDispositivo = tipoDispositivo;
+            }
+
+            // Agregar todos los dispositivos a la base de datos
+            _context.Dispositivos.AddRange(dispositivos);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetDispositivos", dispositivos);
         }
 
-
-
-        // PUT: api/Dispositivos/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDispositivo(int id, Dispositivo dispositivo)
+        // PUT: api/Dispositivos/{numeroSerie}
+        [HttpPut("{numeroSerie}")]
+        public async Task<IActionResult> PutDispositivo(string numeroSerie, Dispositivo dispositivo)
         {
-            if (id != dispositivo.Id)
+            // Verifica que el número de serie en la URL coincida con el del dispositivo proporcionado
+            if (numeroSerie != dispositivo.NumeroSerie)
             {
-                return BadRequest();
+                return BadRequest(new { message = "No se puede cambiar el número de serie." });
+            }
+
+            // Busca el dispositivo existente en la base de datos
+            var existingDispositivo = await _context.Dispositivos.FindAsync(numeroSerie);
+            if (existingDispositivo == null)
+            {
+                return NotFound(new { message = "Dispositivo no encontrado." }); // Mensaje de error
             }
 
             // Validar que el TipoDispositivoId exista en la base de datos
             var tipoDispositivo = await _context.TiposDispositivos.FindAsync(dispositivo.TipoDispositivoId);
             if (tipoDispositivo == null)
             {
-                return BadRequest("El TipoDispositivoId proporcionado no es válido.");
+                return BadRequest(new { message = "El TipoDispositivoId proporcionado no es válido." });
             }
 
-            _context.Entry(dispositivo).State = EntityState.Modified;
+            // Actualiza solo los campos permitidos
+            existingDispositivo.Marca = dispositivo.Marca; // Cambia solo la marca
+            existingDispositivo.ConsumoElectrico = dispositivo.ConsumoElectrico; // Cambia solo el consumo eléctrico
+            existingDispositivo.TipoDispositivoId = dispositivo.TipoDispositivoId; // Cambia el tipo de dispositivo
+            existingDispositivo.TipoDispositivo = tipoDispositivo; // Asigna el tipo de dispositivo encontrado
+
+            _context.Entry(existingDispositivo).State = EntityState.Modified;
 
             try
             {
@@ -89,9 +129,9 @@ namespace Proyecto1.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!DispositivoExists(id))
+                if (!DispositivoExists(numeroSerie))
                 {
-                    return NotFound();
+                    return NotFound(new { message = "Dispositivo no encontrado." });
                 }
                 else
                 {
@@ -99,14 +139,17 @@ namespace Proyecto1.Controllers
                 }
             }
 
-            return NoContent();
+            // Devuelve un mensaje de éxito en lugar del dispositivo
+            return Ok(new { message = "Dispositivo actualizado exitosamente." });
         }
 
-        // DELETE: api/Dispositivos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDispositivo(int id)
+
+
+        // DELETE: api/Dispositivos/{numeroSerie}
+        [HttpDelete("{numeroSerie}")]
+        public async Task<IActionResult> DeleteDispositivo(string numeroSerie)
         {
-            var dispositivo = await _context.Dispositivos.FindAsync(id);
+            var dispositivo = await _context.Dispositivos.FindAsync(numeroSerie);
             if (dispositivo == null)
             {
                 return NotFound();
@@ -118,9 +161,9 @@ namespace Proyecto1.Controllers
             return NoContent();
         }
 
-        private bool DispositivoExists(int id)
+        private bool DispositivoExists(string numeroSerie)
         {
-            return _context.Dispositivos.Any(e => e.Id == id);
+            return _context.Dispositivos.Any(e => e.NumeroSerie == numeroSerie);
         }
     }
 }

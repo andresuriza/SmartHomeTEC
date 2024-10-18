@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace Proyecto1.Models
 {
@@ -12,18 +11,31 @@ namespace Proyecto1.Models
         public DbSet<User> Users { get; set; }
         public DbSet<Dispositivo> Dispositivos { get; set; }
         public DbSet<TipoDispositivo> TiposDispositivos { get; set; }
+        public DbSet<Producto> Productos { get; set; } // Nueva entidad Productos
         public DbSet<DispositivoUsuario> DispositivosUsuarios { get; set; }
         public DbSet<Distribuidor> Distribuidores { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<Factura> Facturas { get; set; }
         public DbSet<CertificadoGarantia> CertificadosGarantia { get; set; }
         public DbSet<HistorialUsuariosDispositivos> HistorialUsuariosDispositivos { get; set; }
-
-        // Nueva entidad DireccionesEntrega
         public DbSet<DireccionEntrega> DireccionesEntrega { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Relación uno a muchos entre Producto y Distribuidor (obligatoria)
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.Distribuidor)
+                .WithMany() // Si necesitas acceder a productos desde el distribuidor, puedes especificar el nombre aquí
+                .HasForeignKey(p => p.DistribuidorCedula) // Usar la cédula como clave foránea
+                .OnDelete(DeleteBehavior.Cascade); // Asegúrate de que el comportamiento de eliminación sea el deseado
+
+            // Relación uno a uno entre Producto y Dispositivo
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.Dispositivo) // Un Producto tiene un Dispositivo
+                .WithOne(d => d.Producto) // Un Dispositivo puede tener un Producto
+                .HasForeignKey<Producto>(p => p.NumeroSerieDispositivo) // Se refiere al número de serie del dispositivo
+                .OnDelete(DeleteBehavior.SetNull); // Cambiado a SetNull para que no se elimine el dispositivo si se elimina el producto
+
             // Índice único para el correo electrónico del usuario
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.CorreoElectronico)
@@ -34,14 +46,9 @@ namespace Proyecto1.Models
                 .HasIndex(d => d.NumeroSerie)
                 .IsUnique();
 
-            // Agregando región al dispositivo
-            modelBuilder.Entity<Dispositivo>()
-                .Property(d => d.Region)
-                .IsRequired(); // Campo obligatorio
-
             // Clave compuesta para la relación Dispositivo-Usuario
             modelBuilder.Entity<DispositivoUsuario>()
-                .HasKey(du => new { du.UserId, du.DispositivoId });
+                .HasKey(du => new { du.UserId, du.DispositivoNumeroSerie });
 
             // Relación entre Dispositivo y TipoDispositivo
             modelBuilder.Entity<Dispositivo>()
@@ -60,7 +67,7 @@ namespace Proyecto1.Models
             modelBuilder.Entity<Pedido>()
                 .HasOne(p => p.Dispositivo)
                 .WithMany(d => d.Pedidos)
-                .HasForeignKey(p => p.DispositivoId);
+                .HasForeignKey(p => p.DispositivoNumeroSerie);
 
             // Relación entre Pedido y Factura
             modelBuilder.Entity<Factura>()
@@ -72,11 +79,11 @@ namespace Proyecto1.Models
             modelBuilder.Entity<Factura>()
                 .HasOne(f => f.Dispositivo)
                 .WithMany(d => d.Facturas)
-                .HasForeignKey(f => f.DispositivoId);
+                .HasForeignKey(f => f.DispositivoNumeroSerie);
 
             // Clave compuesta para historial de dispositivos
             modelBuilder.Entity<HistorialUsuariosDispositivos>()
-                .HasKey(h => new { h.UsuarioId, h.DispositivoId, h.FechaTransferencia });
+                .HasKey(h => new { h.UsuarioId, h.DispositivoNumeroSerie, h.FechaTransferencia });
 
             // Relación entre User y DireccionEntrega (uno a muchos)
             modelBuilder.Entity<DireccionEntrega>()
