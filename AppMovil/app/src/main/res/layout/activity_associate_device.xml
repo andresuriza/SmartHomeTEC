@@ -13,12 +13,21 @@
         android:hint="Descripción del dispositivo"
         android:minHeight="48dp" />
 
-    <EditText
+<!--    <EditText
         android:id="@+id/deviceTypeEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:hint="Tipo de dispositivo" />
+        android:hint="Tipo de dispositivo" />-->
+
+    <Spinner
+        android:id="@+id/typeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:spinnerMode="dropdown"
+        android:layout_marginTop="16dp" />
+
 
     <Spinner
         android:id="@+id/brandSpinner"

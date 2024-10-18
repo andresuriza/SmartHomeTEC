@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
 
         // Referenciar los botones
         val loginButton: Button = findViewById(R.id.loginButton)
-        val registerButton: Button = findViewById(R.id.registerButton)
+
 
         // Configurar el botón para ir a la pantalla de Login
         loginButton.setOnClickListener {
@@ -21,10 +21,5 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Configurar el botón para ir a la pantalla de Registro
-        registerButton.setOnClickListener {
-            val intent = Intent(this, Registro::class.java)
-            startActivity(intent)
-        }
     }
 }

@@ -31,6 +31,13 @@ class HomeActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+        binding.transferirDispositivo.setOnClickListener {
+            val intent = Intent(this, TransferDeviceActivity::class.java).apply {
+                putExtra("username", currentUser)
+            }
+            startActivity(intent)
+        }
+
 
         binding.exitButton.setOnClickListener {
             finishAffinity()

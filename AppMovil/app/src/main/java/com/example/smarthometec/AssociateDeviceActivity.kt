@@ -18,6 +18,7 @@ class AssociateDeviceActivity : AppCompatActivity() {
     private val associatedDevicesList = mutableListOf<String>()
     private val brandIdMap = mutableMapOf<String, Int>() // Mapa para almacenar marca y su ID
     private val roomIdMap = mutableMapOf<String, Int>() // Mapa para almacenar aposento y su ID
+    private val typeIdMap = mutableMapOf<String, Int>()  // Mapa para almacenar tipo de dispositivo y su ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +31,14 @@ class AssociateDeviceActivity : AppCompatActivity() {
         loadBrands()
         loadAssociatedDevices()
         loadRooms()
+        loadDeviceTypes()
 
         binding.associateDeviceButton.setOnClickListener {
             val description = binding.deviceDescriptionEditText.text.toString().trim()
-            val type = binding.deviceTypeEditText.text.toString().trim()
+            //val type = binding.deviceTypeEditText.text.toString().trim()
             //val brand = binding.deviceBrandEditText.text.toString().trim()
+            val typeSelected = binding.typeSpinner.selectedItem.toString() // Tipo seleccionado
+            val typeId = typeIdMap[typeSelected]  // Obtener el ID del tipo
             val selectedBrand = binding.brandSpinner.selectedItem.toString() // Marca seleccionada
             val brandId = brandIdMap[selectedBrand] // Obtener el ID de la marca
             val serialNumberStr = binding.deviceSerialEditText.text.toString().trim()
@@ -44,32 +48,36 @@ class AssociateDeviceActivity : AppCompatActivity() {
             val roomId = roomIdMap[selectedRoom] // Obtener el ID del aposento
 
 
-            if (description.isEmpty() || type.isEmpty() || serialNumberStr.isEmpty() || consumptionStr.isEmpty() || roomId == null || brandId == null) {
+
+
+            if (description.isEmpty() || typeId== null || selectedBrand.isEmpty() || serialNumberStr.isEmpty() || consumptionStr.isEmpty() || roomId == null || brandId == null) {
                 Toast.makeText(this, "Todos los campos son obligatorios", Toast.LENGTH_SHORT).show()
             } else {
                 try {
                     val serialNumber = serialNumberStr.toInt()
                     val consumption = consumptionStr.toInt()
                     //val roomId = dbManager.getRoomIdByName(room)
+                    val guaranteePeriod = dbManager.getGuaranteePeriodByTypeId(typeId)
 
                     // Calcular la fecha de garantía
                     val currentDate = Date()
-                    val guaranteePeriod = getGuaranteePeriodForType(type)
+                    //val guaranteePeriod = getGuaranteePeriodForType(typeSelected)
                     val guaranteeEndDate = Calendar.getInstance().apply {
                         time = currentDate
                         add(Calendar.MONTH, guaranteePeriod)
                     }.time
                     val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     val formattedEndDate = dateFormat.format(guaranteeEndDate)
+                    val todaydate= dateFormat.format(currentDate)
 
                     // Agregar el dispositivo a la base de datos
-                    dbManager.addDevice(description, type, brandId, serialNumber, consumption, roomId, currentUser)
-                    associatedDevicesList.add("$description ($type, $selectedBrand, $serialNumber, Consumo: $consumption, Aposento: $selectedRoom, Garantía: $formattedEndDate)")
+                    dbManager.addDevice(description, typeId, brandId, serialNumber, consumption, roomId,  currentUser, todaydate, formattedEndDate)
+                    associatedDevicesList.add("$description ($typeSelected, $selectedBrand, $serialNumber, Consumo: $consumption, Aposento: $selectedRoom, Garantía: $formattedEndDate)")
                     binding.associatedDevicesTextView.text = associatedDevicesList.joinToString("\n")
 
                     // Limpiar los campos de texto
                     binding.deviceDescriptionEditText.text.clear()
-                    binding.deviceTypeEditText.text.clear()
+
                     binding.deviceSerialEditText.text.clear()
                     binding.deviceConsumptionEditText.text.clear()
                     //binding.deviceRoomEditText.text.clear()
@@ -160,14 +168,48 @@ class AssociateDeviceActivity : AppCompatActivity() {
         associatedDevicesList.addAll(dbManager.getDevicesByUser(currentUser))
         binding.associatedDevicesTextView.text = associatedDevicesList.joinToString("\n")
     }
+    private fun loadDeviceTypes() {
+        val typeList = dbManager.getAllDeviceTypes() // Obtener tipos de dispositivos de la base de datos
+        val typeNames = mutableListOf<String>()
 
-    private fun getGuaranteePeriodForType(type: String): Int {
+        // Agregar el hint como el primer elemento
+        typeNames.add("Seleccione un tipo")
+
+        // Llenar el mapa de tipos con su ID
+        for (type in typeList) {
+            typeNames.add(type.name)
+            typeIdMap[type.name] = type.id // Almacenar el ID del tipo con su nombre
+        }
+
+        // Crear el adaptador para el Spinner de tipos de dispositivos
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, typeNames)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.typeSpinner.adapter = adapter
+
+        // Configurar el comportamiento cuando no se selecciona ningún tipo (hint seleccionado)
+        binding.typeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position == 0) {
+                    // Hint seleccionado, no hacer nada
+                } else {
+                    val selectedType = typeNames[position]
+                    Toast.makeText(applicationContext, "Seleccionaste: $selectedType", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // No se seleccionó nada, puedes manejarlo si es necesario
+            }
+        }
+    }
+
+/*    private fun getGuaranteePeriodForType(type: String): Int {
         // Asigna los períodos de garantía según el tipo de dispositivo
         return when (type.toLowerCase(Locale.ROOT)) {
             "electrodoméstico" -> 24
             "electrónica" -> 12
             else -> 6
         }
-    }
+    }*/
 }
 

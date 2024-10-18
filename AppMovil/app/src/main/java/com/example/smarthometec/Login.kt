@@ -36,7 +36,7 @@ class Login : AppCompatActivity() {
         val usernameEditText: EditText = binding.username
         val passwordEditText: EditText = binding.password
         val loginButton: Button = binding.loginButton
-        val registerButton: Button = binding.registerButton
+
 
         // Configuración del botón de inicio de sesión
         loginButton.setOnClickListener {
@@ -58,11 +58,6 @@ class Login : AppCompatActivity() {
             }
         }
 
-        // Botón para ir a la pantalla de registro
-        registerButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
     }
 }
 
