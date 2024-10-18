@@ -4,7 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { Nav } from 'react-bootstrap';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  PieController,
+} from 'chart.js';
+import { Pie } from 'react-chartjs-2';
 import './AdminDashboard.css';
+
+// Registra los elementos
+ChartJS.register(ArcElement, Tooltip, Legend, PieController);
 
 const Sidebar = ({ sections, activeSection, setActiveSection, isOpen, toggle }) => (
   <div className={`sidebar bg-light border-right ${isOpen ? 'is-open' : ''}`} style={{ minHeight: '100vh' }}>
@@ -41,25 +52,30 @@ export default function AdminDashboard() {
   const [devices, setDevices] = useState([]);
   const [deviceTypes, setDeviceTypes] = useState([]);
   const [distributors, setDistributors] = useState([]);
+  const [devicesByRegionData, setDevicesByRegionData] = useState([]);
+  const [regionChartData, setRegionChartData] = useState({ labels: [], data: [] }); // Estado para el gráfico de pastel
 
   const [newDevice, setNewDevice] = useState({ id: '', type: '', serialNumber: '', brand: '', powerConsumption: '' });
   const [editing, setEditing] = useState(false);
   const [newDeviceType, setNewDeviceType] = useState({ id: '', name: '', description: '', warrantyPeriod: '' });
-  const [newDistributor, setNewDistributor] = useState({ juridicalId: '', name: '', region: '' }); // Agregando región
+  const [newDistributor, setNewDistributor] = useState({ juridicalId: '', name: '', region: '' });
 
   const [errorMessage, setErrorMessage] = useState('');
   const [typeErrorMessage, setTypeErrorMessage] = useState('');
   const [distributorErrorMessage, setDistributorErrorMessage] = useState('');
+    // Cambiar esto según la lógica de tu aplicación
+  const totalUsers = 10; 
+  const devicesWithUsers = devices.filter(device => device.asociadoAUsuario);
+  const devicesWithoutUsers = devices.filter(device => !device.asociadoAUsuario);
+  const averageDevicesPerUser = totalUsers ? (devices.length / totalUsers).toFixed(2) : 0; // Definido aquí
 
-  const devicesByRegion = devices.reduce((regions, device) => {
-    if (!regions[device.region]) {
-      regions[device.region] = 0;
-    }
-    regions[device.region]++;
-    return regions;
-  }, {});
-
-  // Fetch devices from the API
+  const dataForUserDevices = {
+    labels: ['Dispositivos Asociados a Usuarios', 'Dispositivos No Asociados'],
+    datasets: [{
+      data: [devicesWithUsers.length, devicesWithoutUsers.length],
+      backgroundColor: ['#FF6384', '#36A2EB'],
+    }],
+  };
   const fetchDevices = async () => {
     try {
       const response = await fetch('https://localhost:5555/api/Dispositivos');
@@ -70,7 +86,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Fetch device types from the API
   const fetchDeviceTypes = async () => {
     try {
       const response = await fetch('https://localhost:5555/api/TipoDispositivo');
@@ -81,7 +96,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Fetch distributors from the API
   const fetchDistributors = async () => {
     try {
       const response = await fetch('https://localhost:5555/api/Distribuidor');
@@ -92,10 +106,39 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchDevicesByRegion = async () => {
+    try {
+      const response = await fetch('https://localhost:5555/api/Producto/dispositivos-por-region');
+      const data = await response.json();
+      
+      setDevicesByRegionData(data);
+  
+      // Transformar datos para el gráfico de pastel
+      const labels = data.map(item => item.region); // Obtener las regiones
+      const chartData = data.map(item => item.cantidad); // Obtener las cantidades
+  
+      const totalDevices = devices.length; // Total de dispositivos
+      const definedDevicesCount = chartData.reduce((acc, count) => acc + count, 0); // Contar dispositivos definidos
+      const undefinedDevicesCount = totalDevices - definedDevicesCount; // Contar dispositivos no definidos
+  
+      // Agregar la opción "No definida"
+      const updatedLabels = [...labels, 'No definida'];
+      const updatedData = [...chartData, undefinedDevicesCount];
+  
+      setRegionChartData({
+        labels: updatedLabels,
+        data: updatedData,
+      });
+    } catch (error) {
+      console.error("Error fetching devices by region:", error);
+    }
+  };
+
   useEffect(() => {
     fetchDevices();
     fetchDeviceTypes(); 
-    fetchDistributors(); // Fetch distributors when component mounts
+    fetchDistributors(); 
+    fetchDevicesByRegion(); 
   }, []);
 
   const handleAddDevice = async (e) => {
@@ -131,11 +174,10 @@ export default function AdminDashboard() {
         throw new Error('Error al agregar el dispositivo');
       }
 
-      // Reset the form and refresh the devices list
       setNewDevice({ id: '', type: '', serialNumber: '', brand: '', powerConsumption: '' });
       setEditing(false);
       setErrorMessage('');
-      await fetchDevices(); // Refresh the device list
+      await fetchDevices(); 
     } catch (error) {
       setErrorMessage('Error al agregar el dispositivo: ' + error.message);
     }
@@ -149,7 +191,7 @@ export default function AdminDashboard() {
       brand: device.marca,
       powerConsumption: device.consumoElectrico
     });
-    setEditing(true); // Cambia a modo edición
+    setEditing(true); 
   };
 
   const handleUpdateDevice = async (e) => {
@@ -180,17 +222,15 @@ export default function AdminDashboard() {
         throw new Error(errorResponse.message || 'Error al actualizar el dispositivo');
       }
 
-      // Reset the form and refresh the devices list
       setNewDevice({ id: '', type: '', serialNumber: '', brand: '', powerConsumption: '' });
       setEditing(false);
       setErrorMessage('');
-      await fetchDevices(); // Refresh the device list
+      await fetchDevices(); 
     } catch (error) {
       setErrorMessage('Error al actualizar el dispositivo: ' + error.message);
     }
   };
 
-  // Funciones para gestionar tipos de dispositivos
   const handleAddDeviceType = async (e) => {
     e.preventDefault();
     if (!newDeviceType.name || !newDeviceType.description || !newDeviceType.warrantyPeriod) {
@@ -221,13 +261,12 @@ export default function AdminDashboard() {
       setDeviceTypes([...deviceTypes, addedDeviceType]);
       setNewDeviceType({ id: '', name: '', description: '', warrantyPeriod: '' });
       setTypeErrorMessage('');
-      await fetchDeviceTypes(); // Refresh the device types list
+      await fetchDeviceTypes(); 
     } catch (error) {
       setTypeErrorMessage('Error al agregar el tipo de dispositivo: ' + error.message);
     }
   };
 
-  // Function to handle editing a device type
   const handleEditDeviceType = (deviceType) => {
     setNewDeviceType({
       id: deviceType.id,
@@ -235,7 +274,7 @@ export default function AdminDashboard() {
       description: deviceType.descripcion,
       warrantyPeriod: deviceType.tiempoGarantia
     });
-    setEditing(true); // Switch to editing mode
+    setEditing(true); 
   };
 
   const handleUpdateDeviceType = async (e) => {
@@ -266,20 +305,18 @@ export default function AdminDashboard() {
         throw new Error(errorResponse.message || 'Error al actualizar el tipo de dispositivo');
       }
 
-      // Reset the form and refresh the device types list
       setNewDeviceType({ id: '', name: '', description: '', warrantyPeriod: '' });
       setEditing(false);
       setTypeErrorMessage('');
-      await fetchDeviceTypes(); // Refresh the device types list
+      await fetchDeviceTypes(); 
     } catch (error) {
       setTypeErrorMessage('Error al actualizar el tipo de dispositivo: ' + error.message);
     }
   };
 
-  // Funciones para gestionar distribuidores
   const handleAddDistributor = async (e) => {
     e.preventDefault();
-    if (!newDistributor.juridicalId || !newDistributor.name || !newDistributor.region) { // Verifica la región
+    if (!newDistributor.juridicalId || !newDistributor.name || !newDistributor.region) {
       setDistributorErrorMessage('Por favor, complete toda la información del distribuidor.');
       return;
     }
@@ -287,7 +324,7 @@ export default function AdminDashboard() {
     const distributorToAdd = {
       CedulaJuridica: newDistributor.juridicalId,
       Nombre: newDistributor.name,
-      Region: newDistributor.region, // Agregando la región
+      Region: newDistributor.region,
     };
 
     try {
@@ -303,8 +340,8 @@ export default function AdminDashboard() {
         throw new Error('Error al agregar el distribuidor');
       }
 
-      await fetchDistributors(); // Refresh the distributors list
-      setNewDistributor({ juridicalId: '', name: '', region: '' }); // Reinicia el formulario
+      await fetchDistributors(); 
+      setNewDistributor({ juridicalId: '', name: '', region: '' });
       setDistributorErrorMessage('');
     } catch (error) {
       setDistributorErrorMessage('Error al agregar el distribuidor: ' + error.message);
@@ -315,14 +352,14 @@ export default function AdminDashboard() {
     setNewDistributor({
       juridicalId: distributor.cedulaJuridica,
       name: distributor.nombre,
-      region: distributor.region, // Agregando la región al editar
+      region: distributor.region,
     });
-    setEditing(true); // Cambia a modo edición
+    setEditing(true); 
   };
 
   const handleUpdateDistributor = async (e) => {
     e.preventDefault();
-    if (!newDistributor.juridicalId || !newDistributor.name || !newDistributor.region) { // Verifica la región
+    if (!newDistributor.juridicalId || !newDistributor.name || !newDistributor.region) {
       setDistributorErrorMessage('Por favor, complete toda la información del distribuidor.');
       return;
     }
@@ -330,7 +367,7 @@ export default function AdminDashboard() {
     const distributorToUpdate = {
       CedulaJuridica: newDistributor.juridicalId,
       Nombre: newDistributor.name,
-      Region: newDistributor.region, // Agregando la región
+      Region: newDistributor.region,
     };
 
     try {
@@ -347,8 +384,8 @@ export default function AdminDashboard() {
         throw new Error(errorResponse.message || 'Error al actualizar el distribuidor');
       }
 
-      await fetchDistributors(); // Refresh the distributors list
-      setNewDistributor({ juridicalId: '', name: '', region: '' }); // Reinicia el formulario
+      await fetchDistributors(); 
+      setNewDistributor({ juridicalId: '', name: '', region: '' });
       setDistributorErrorMessage('');
       setEditing(false);
     } catch (error) {
@@ -367,8 +404,8 @@ export default function AdminDashboard() {
   const handleCancelEdit = () => {
     setNewDevice({ id: '', type: '', serialNumber: '', brand: '', powerConsumption: '' });
     setNewDeviceType({ id: '', name: '', description: '', warrantyPeriod: '' });
-    setNewDistributor({ juridicalId: '', name: '', region: '' }); // Reinicia el formulario de distribuidor
-    setEditing(false); // Cambia a modo agregar
+    setNewDistributor({ juridicalId: '', name: '', region: '' });
+    setEditing(false); 
     setErrorMessage('');
     setTypeErrorMessage('');
     setDistributorErrorMessage('');
@@ -492,7 +529,6 @@ export default function AdminDashboard() {
           </section>
         )}
 
-        {/* Sección para gestionar tipos de dispositivos */}
         {activeSection === 'Gestión de Tipos de Dispositivos' && (
           <section className="section">
             <h2>Gestión de Tipos de Dispositivos</h2>
@@ -581,7 +617,6 @@ export default function AdminDashboard() {
           </section>
         )}
 
-        {/* Gestión de Distribuidores */}
         {activeSection === 'Gestión de Distribuidores' && (
           <section className="section">
             <h2>Gestión de Distribuidores</h2>
@@ -651,7 +686,7 @@ export default function AdminDashboard() {
                     <tr key={distributor.cedulaJuridica}>
                       <td>{distributor.cedulaJuridica}</td>
                       <td>{distributor.nombre}</td>
-                      <td>{distributor.region}</td> {/* Mostrando la región */}
+                      <td>{distributor.region}</td>
                       <td>
                         <button 
                           className="btn btn-warning"
@@ -667,21 +702,89 @@ export default function AdminDashboard() {
             </div>
           </section>
         )}
-
         {activeSection === 'Indicadores del Sistema' && (
           <section className="section">
             <h2>Indicadores del Sistema</h2>
             <ul className="list-group">
+              <li className="list-group-item">Cantidad promedio de dispositivos por usuario: {averageDevicesPerUser}</li>
               <li className="list-group-item">Cantidad total de dispositivos gestionados por el sistema: {devices.length}</li>
-              <li className="list-group-item">Cantidad total de dispositivos por región:</li>
-              <ul className="list-group">
-                {Object.entries(devicesByRegion).map(([region, count]) => (
-                  <li key={region} className="list-group-item">{region}: {count} dispositivos</li>
-                ))}
-              </ul>
             </ul>
+
+            <div className="chart-grid">
+              <div className="chart-container">
+                <h3>Distribución de Dispositivos por Región</h3>
+                <div style={{ width: '500px', height: '500px' }}> {/* Aumentar el tamaño */}
+                <Pie
+                  data={{
+                    labels: regionChartData.labels,
+                    datasets: [{
+                      data: regionChartData.data,
+                      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                      hoverOffset: 10, // Espaciado adicional en el hover
+                    }],
+                  }}
+                  options={{
+                    plugins: {
+                      tooltip: {
+                        bodyFont: {
+                          size: 16, // Tamaño de fuente del tooltip
+                          family: 'Arial, sans-serif',
+                          weight: 'bold',
+                          color: 'black',
+                        },
+                        titleFont: {
+                          size: 18,
+                          family: 'Arial, sans-serif',
+                          weight: 'bold',
+                          color: 'black',
+                        },
+                        callbacks: {
+                          label: (tooltipItem) => {
+                            const label = tooltipItem.label || '';
+                            const value = tooltipItem.raw || 0;
+                            return `${label}: ${value}`;
+                          },
+                        },
+                      },
+                      legend: {
+                        labels: {
+                          font: {
+                            size: 16,
+                            family: 'Arial, sans-serif',
+                            weight: 'bold',
+                            color: 'black',
+                          },
+                          color: 'rgba(0, 0, 0, 0.7)',
+                        },
+                      },
+                    },
+                    animations: {
+                      // Configuración para animar el escalado de los segmentos al pasar el mouse
+                      tension: {
+                        duration: 1,
+                        easing: 'easeInOutQuad',
+                        from: 1,
+                        to: 1.5, // Escala un poco más
+                        loop: true,
+                        
+                      },
+                    },
+                  }}
+                />
+              </div>
+              </div>
+
+              <div className="chart-container">
+                <h3>Distribución de Dispositivos Asociados a Usuarios</h3>
+                <div style={{ width: '500px', height: '500px' }}> {/* Aumentar el tamaño */}
+                  <Pie data={dataForUserDevices} />
+                </div>
+              </div>
+            </div>
           </section>
         )}
+
+
 
         {activeSection === 'Gestión de la Tienda en Línea' && (
           <section className="section">

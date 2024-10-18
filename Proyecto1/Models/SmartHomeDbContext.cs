@@ -25,15 +25,15 @@ namespace Proyecto1.Models
             // Relación uno a muchos entre Producto y Distribuidor (obligatoria)
             modelBuilder.Entity<Producto>()
                 .HasOne(p => p.Distribuidor)
-                .WithMany() // Si necesitas acceder a productos desde el distribuidor, puedes especificar el nombre aquí
+                .WithMany() // Ajusta esto si necesitas acceder a productos desde el distribuidor
                 .HasForeignKey(p => p.DistribuidorCedula) // Usar la cédula como clave foránea
-                .OnDelete(DeleteBehavior.Cascade); // Asegúrate de que el comportamiento de eliminación sea el deseado
+                .OnDelete(DeleteBehavior.Cascade); // Comportamiento de eliminación
 
             // Relación uno a uno entre Producto y Dispositivo
             modelBuilder.Entity<Producto>()
-                .HasOne(p => p.Dispositivo) // Un Producto tiene un Dispositivo
-                .WithOne(d => d.Producto) // Un Dispositivo puede tener un Producto
-                .HasForeignKey<Producto>(p => p.NumeroSerieDispositivo) // Se refiere al número de serie del dispositivo
+                .HasOne(p => p.Dispositivo)
+                .WithOne(d => d.Producto)
+                .HasForeignKey<Producto>(p => p.NumeroSerieDispositivo)
                 .OnDelete(DeleteBehavior.SetNull); // Cambiado a SetNull para que no se elimine el dispositivo si se elimina el producto
 
             // Índice único para el correo electrónico del usuario

@@ -94,3 +94,38 @@
 .d-flex .btn {
   margin-right: 10px; /* Espaciado entre los botones */
 }
+.chart-grid {
+  display: grid; /* Utiliza grid para organizar los gráficos */
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); /* Cambiar el ancho mínimo a 500px */
+  gap: 30px; /* Espacio entre los elementos del grid */
+  max-width: 1200px; /* Ajusta el ancho máximo del contenedor del grid */
+  margin: 0 auto; /* Centra el grid horizontalmente */
+}
+
+.chart-container {
+  background-color: #fff; /* Fondo blanco para el contenedor del gráfico */
+  border-radius: 10px; /* Bordes redondeados más grandes */
+  padding: 20px; /* Espaciado interno */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 4px rgba(0, 0, 0, 0.1); /* Sombra más profunda */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra el contenido horizontalmente */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave para efectos de hover */
+}
+
+/* Efecto de hover para el contenedor del gráfico */
+.chart-container:hover {
+  transform: translateY(-10px) scale(1.01) rotate(0deg); /* Eleva y escala el contenedor más al pasar el mouse */
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3), 0 8px 8px rgba(0, 0, 0, 0.15); /* Aumenta la sombra al pasar el mouse */
+}
+
+/* Estilos para el canvas de los gráficos */
+canvas {
+  max-width: 100%; /* Ajusta el canvas para que no desborde su contenedor */
+  height: auto; /* Mantiene la proporción del gráfico */
+  border-radius: 10px; /* Bordes redondeados para el gráfico */
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2); /* Sombra interna para efecto 3D */
+}
+
+
+

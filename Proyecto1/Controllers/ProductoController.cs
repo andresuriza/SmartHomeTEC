@@ -134,6 +134,22 @@ namespace Proyecto1.Controllers
 
             return Ok(productosDto);
         }
+        // Método en el controlador ProductoController
+        [HttpGet("dispositivos-por-region")]
+        public async Task<ActionResult<IEnumerable<object>>> GetCantidadDispositivosPorRegion()
+        {
+            var dispositivosPorRegion = await _context.Productos
+                .Include(p => p.Distribuidor) // Incluir la información del distribuidor
+                .GroupBy(p => p.Distribuidor.Region)
+                .Select(g => new
+                {
+                    Region = g.Key,
+                    Cantidad = g.Count()
+                })
+                .ToListAsync();
+
+            return Ok(dispositivosPorRegion);
+        }
 
         // GET: api/Producto/detalles/{id}
         [HttpGet("detalles/{id}")]
