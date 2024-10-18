@@ -44,7 +44,7 @@ class AssociateDeviceActivity : AppCompatActivity() {
             val roomId = roomIdMap[selectedRoom] // Obtener el ID del aposento
 
 
-            if (description.isEmpty() || type.isEmpty() || serialNumberStr.isEmpty() || consumptionStr.isEmpty() || roomId == null) {
+            if (description.isEmpty() || type.isEmpty() || serialNumberStr.isEmpty() || consumptionStr.isEmpty() || roomId == null || brandId == null) {
                 Toast.makeText(this, "Todos los campos son obligatorios", Toast.LENGTH_SHORT).show()
             } else {
                 try {
@@ -63,7 +63,7 @@ class AssociateDeviceActivity : AppCompatActivity() {
                     val formattedEndDate = dateFormat.format(guaranteeEndDate)
 
                     // Agregar el dispositivo a la base de datos
-                    dbManager.addDevice(description, type, selectedBrand, serialNumber, consumption, roomId, currentUser)
+                    dbManager.addDevice(description, type, brandId, serialNumber, consumption, roomId, currentUser)
                     associatedDevicesList.add("$description ($type, $selectedBrand, $serialNumber, Consumo: $consumption, Aposento: $selectedRoom, Garantía: $formattedEndDate)")
                     binding.associatedDevicesTextView.text = associatedDevicesList.joinToString("\n")
 

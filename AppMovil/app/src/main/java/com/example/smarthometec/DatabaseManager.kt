@@ -4,16 +4,10 @@ package com.example.samrthometec
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContentValues
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.OutputStream
 
 class DatabaseManager(private val context: Context) {
     private val dbHelper = MyDatabaseHelper(context)
@@ -174,7 +168,7 @@ class DatabaseManager(private val context: Context) {
         return exists
 
     }
-    fun addDevice(description: String, type: String, brand: String, serialNumber: Int, consumption: Int, roomId: Int, username: String) {
+    fun addDevice(description: String, type: String, brand: Int, serialNumber: Int, consumption: Int, roomId: Int, username: String) {
         val db = dbHelper.writableDatabase
         try {
             val values = ContentValues().apply {
@@ -221,22 +215,7 @@ class DatabaseManager(private val context: Context) {
         }
         return devicesList
     }
-    fun getRoomIdByName(roomName: String): Int {
-        val db = dbHelper.readableDatabase
-        var roomId = -1
-        try {
-            val cursor = db.rawQuery("SELECT ID FROM Aposentos WHERE Nombre = ?", arrayOf(roomName))
-            if (cursor.moveToFirst()) {
-                roomId = cursor.getInt(0)
-            }
-            cursor.close()
-        } catch (e: Exception) {
-            Log.e("DatabaseManager", "Error fetching room ID: ${e.message}")
-        } finally {
-            db.close()
-        }
-        return roomId
-    }
+
     fun getAllBrands(): List<Brand> {
         val brands = mutableListOf<Brand>()
         val db = dbHelper.readableDatabase
@@ -255,6 +234,8 @@ class DatabaseManager(private val context: Context) {
 
     data class Brand(val id: Int, val name: String)
     data class Aposento(val id: Int, val name: String)
+    data class User(val username: String)
+
 
     fun getAposentosSpin (username: String): List<Aposento> {
         val aposentosList = mutableListOf<Aposento>()
@@ -276,6 +257,53 @@ class DatabaseManager(private val context: Context) {
         }
         return aposentosList
     }
+    fun transferDevice(devicename: String, currentUser: String, newOwner: String) {
+        val db = dbHelper.writableDatabase
+        try {
+            // Actualizar el propietario del dispositivo en la base de datos
+            val values = ContentValues().apply {
+                put("UsuarioAso", newOwner)
+            }
+            db.update("Dispositivos", values, "ID = ? AND UsuarioAso = ?", arrayOf(devicename.toString(), currentUser))
+
+            // Registrar el historial de transferencia
+            val historyValues = ContentValues().apply {
+                put("DeviceID", devicename)
+                put("OldOwner", currentUser)
+                put("NewOwner", newOwner)
+                put("TransferDate", System.currentTimeMillis())
+            }
+            db.insert("DeviceTransferHistory", null, historyValues)
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error transferring device: ${e.message}")
+        } finally {
+            db.close()
+        }
+    }
+    fun getAllUsersExcept(currentUser: String): List<User> {
+        val users = mutableListOf<User>()
+        val db = dbHelper.readableDatabase
+        try {
+            val cursor = db.rawQuery(
+                "SELECT username FROM Cliente WHERE username != ?",
+                arrayOf(currentUser)
+            )
+            if (cursor.moveToFirst()) {
+                do {
+                    val username = cursor.getString(cursor.getColumnIndexOrThrow("username"))
+                    users.add(User(username))
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching users: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return users
+    }
+
+
 
 
 }
