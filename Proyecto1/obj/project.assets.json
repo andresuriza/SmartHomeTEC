@@ -6882,19 +6882,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ulise\\.nuget\\packages\\": {}
+    "C:\\Users\\Uriza\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ulise\\Source\\Repos\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
+      "projectUniqueName": "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
       "projectName": "Proyecto1",
-      "projectPath": "C:\\Users\\ulise\\Source\\Repos\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
-      "packagesPath": "C:\\Users\\ulise\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ulise\\Source\\Repos\\SmartHomeTEC\\Proyecto1\\obj\\",
+      "projectPath": "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
+      "packagesPath": "C:\\Users\\Uriza\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ulise\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Uriza\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

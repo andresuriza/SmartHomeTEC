@@ -700,3 +700,9 @@ C:\Users\ulise\Source\Repos\SmartHomeTEC\Proyecto1\obj\Debug\net8.0\scopedcss\bu
 C:\Users\ulise\Source\Repos\SmartHomeTEC\Proyecto1\obj\Debug\net8.0\Proyecto1.csproj.Up2Date
 C:\Users\ulise\Source\Repos\SmartHomeTEC\Proyecto1\obj\Debug\net8.0\Proyecto1.genruntimeconfig.cache
 C:\Users\ulise\Source\Repos\SmartHomeTEC\Proyecto1\obj\Debug\net8.0\ref\Proyecto1.dll
+C:\Users\Uriza\Documents\TEC\Bases\SmartHomeTEC\Proyecto1\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\Uriza\Documents\TEC\Bases\SmartHomeTEC\Proyecto1\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\Uriza\Documents\TEC\Bases\SmartHomeTEC\Proyecto1\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Uriza\Documents\TEC\Bases\SmartHomeTEC\Proyecto1\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\Users\Uriza\Documents\TEC\Bases\SmartHomeTEC\Proyecto1\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Uriza\Documents\TEC\Bases\SmartHomeTEC\Proyecto1\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
