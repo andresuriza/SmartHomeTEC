@@ -75,8 +75,6 @@ class DatabaseManager(private val context: Context) {
     }
 
 
-
-
     fun getAposentosByUser(username: String): List<String> {
         val aposentosList = mutableListOf<String>()
         val db = dbHelper.readableDatabase
@@ -97,25 +95,7 @@ class DatabaseManager(private val context: Context) {
         return aposentosList
     }
 
-/*    fun addAposento(nombre: String, usuarioAso: String) {
-        val db = dbHelper.writableDatabase
-        try {
-            val values = ContentValues().apply {
-                put("Nombre", nombre)
-                put("UsuarioAso", usuarioAso)
-            }
-            val result = db.insert("Aposentos", null, values)
-            if (result == -1L) {
-                Log.e("DatabaseManager", "Error inserting Aposento: $nombre")
-            } else {
-                Log.d("DatabaseManager", "Aposento added: $nombre for user $usuarioAso")
-            }
-        } catch (e: Exception) {
-            Log.e("DatabaseManager", "Error adding Aposento: ${e.message}")
-        } finally {
-            db.close()
-        }
-    }*/
+
     fun addAposento(nombre: String, usuarioAso: String) {
         val db = dbHelper.writableDatabase
         try {
@@ -313,48 +293,107 @@ class DatabaseManager(private val context: Context) {
         cursor.close()
         return guaranteePeriod
     }
-    // En DatabaseManager
-    fun transferDevice(deviceName: String, currentUser: String, newOwner: String) {
+
+    fun transferDevice(deviceString: String, currentUser: String, newOwner: String) {
         val db = dbHelper.writableDatabase
         try {
-            // Obtener el número de serie, la fecha de garantía y la fecha de asociación desde la tabla Dispositivos
-            val cursor = db.rawQuery("SELECT NumeroSerie, FechaAsocie, FechaGarantiaFin FROM Dispositivos WHERE Descripcion = ? AND UsuarioAso = ?", arrayOf(deviceName, currentUser))
+            // Obtener el NumeroSerie del dispositivo a partir de la selección
+            val numeroSerie = deviceString.split("Serial: ")[1].toInt()  // Extraer el NumeroSerie del formato
+
+            Log.d("TransferDevice", "Iniciando transferencia del dispositivo: $numeroSerie del usuario $currentUser al nuevo dueño $newOwner")
+
+            // Obtener la fecha de garantía y la fecha de asociación desde la tabla Dispositivos
+            val cursor = db.rawQuery("SELECT FechaAsocie, FechaGarantiaFin FROM Dispositivos WHERE NumeroSerie = ? AND UsuarioAso = ?", arrayOf(numeroSerie.toString(), currentUser))
+
             if (cursor.moveToFirst()) {
-                val serialNumber = cursor.getInt(cursor.getColumnIndexOrThrow("NumeroSerie"))
                 val fechaAsocie = cursor.getString(cursor.getColumnIndexOrThrow("FechaAsocie"))
                 val fechaGarantiaFin = cursor.getString(cursor.getColumnIndexOrThrow("FechaGarantiaFin"))
+
+                Log.d("TransferDevice", "Dispositivo encontrado: $numeroSerie, Fecha Asocie: $fechaAsocie, Fecha Garantía Fin: $fechaGarantiaFin")
 
                 // Registrar la transferencia en la tabla UsuariosHistoricos
                 val currentDate = System.currentTimeMillis() // Obtener la fecha actual para la transferencia
                 val transferDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(currentDate)
 
                 val contentValues = ContentValues().apply {
-                    put("NSerie", serialNumber)
+                    put("NSerie", numeroSerie)
                     put("UsuarioActual", newOwner)
                     put("UsuarioAnterior", currentUser)
                     put("FechaAsocie", fechaAsocie)
                     put("FechaIntercambio", transferDate)
                     put("FechaGarantiaFin", fechaGarantiaFin)
                 }
-                db.insert("UsuariosHistoricos", null, contentValues)
+
+                val insertResult = db.insert("UsuariosHistoricos", null, contentValues)
+                if (insertResult == -1L) {
+                    Log.e("TransferDevice", "Error insertando en UsuariosHistoricos")
+                } else {
+                    Log.d("TransferDevice", "Registro insertado en UsuariosHistoricos correctamente")
+                }
 
                 // Actualizar el usuario actual en la tabla Dispositivos
                 val updateValues = ContentValues().apply {
                     put("UsuarioAso", newOwner)
                 }
-                db.update("Dispositivos", updateValues, "NumeroSerie = ?", arrayOf(serialNumber.toString()))
+
+                val updateResult = db.update("Dispositivos", updateValues, "NumeroSerie = ?", arrayOf(numeroSerie.toString()))
+                if (updateResult > 0) {
+                    Log.d("TransferDevice", "Usuario actualizado correctamente en Dispositivos")
+                } else {
+                    Log.e("TransferDevice", "Error actualizando UsuarioAso en Dispositivos")
+                }
 
                 cursor.close()
             } else {
-                // Si no se encuentra el dispositivo, lanzar un mensaje de error
+                Log.e("TransferDevice", "Dispositivo no encontrado en la base de datos")
                 Toast.makeText(context, "Dispositivo no encontrado", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Log.e("DatabaseManager", "Error transferring device: ${e.message}")
+            Log.e("TransferDevice", "Error transfiriendo dispositivo: ${e.message}")
         } finally {
             db.close()
         }
     }
+
+
+    fun getDevicesWithTypeByUser(username: String): List<Device> {
+        val devicesList = mutableListOf<Device>()
+        val db = dbHelper.readableDatabase
+        try {
+            // Consulta para obtener dispositivos del usuario, y el nombre del tipo desde la tabla Tipo
+            val cursor = db.rawQuery(
+                """
+            SELECT d.Descripcion, d.NumeroSerie, t.Nombre 
+            FROM Dispositivos d 
+            INNER JOIN Tipo t ON d.IDTipo = t.ID
+            WHERE d.UsuarioAso = ?
+            """, arrayOf(username)
+            )
+
+            if (cursor.moveToFirst()) {
+                do {
+                    val description = cursor.getString(cursor.getColumnIndexOrThrow("Descripcion"))
+                    val serialNumber = cursor.getInt(cursor.getColumnIndexOrThrow("NumeroSerie"))
+                    val tipo = cursor.getString(cursor.getColumnIndexOrThrow("Nombre"))
+
+                    devicesList.add(Device(description, tipo, serialNumber))
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching Devices with Type: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return devicesList
+    }
+
+    // Clase de dispositivo que incluye la descripción, tipo y número de serie
+    data class Device(val description: String, val tipo: String, val numeroSerie: Int)
+
+
+
+
 
 
 
