@@ -10,6 +10,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class DatabaseManager(private val context: Context) {
@@ -138,7 +139,7 @@ class DatabaseManager(private val context: Context) {
         var exists = false
         try {
             val cursor = db.rawQuery(
-                "SELECT * FROM Cliente WHERE username = ? AND password = ?",
+                "SELECT * FROM Cliente WHERE correo = ? AND password = ?",
                 arrayOf(username, password)
             )
             exists = cursor.moveToFirst()
@@ -249,12 +250,12 @@ class DatabaseManager(private val context: Context) {
         val db = dbHelper.readableDatabase
         try {
             val cursor = db.rawQuery(
-                "SELECT username FROM Cliente WHERE username != ?",
+                "SELECT correo FROM Cliente WHERE correo != ?",
                 arrayOf(currentUser)
             )
             if (cursor.moveToFirst()) {
                 do {
-                    val username = cursor.getString(cursor.getColumnIndexOrThrow("username"))
+                    val username = cursor.getString(cursor.getColumnIndexOrThrow("correo"))
                     users.add(User(username))
                 } while (cursor.moveToNext())
             }
@@ -387,6 +388,39 @@ class DatabaseManager(private val context: Context) {
         }
         return devicesList
     }
+    fun updateDeviceStatus(numeroSerie: Int, isOn: Boolean, timeOn: Long) {
+        val db = dbHelper.writableDatabase
+        val contentValues = ContentValues().apply {
+            put("IsOn", if (isOn) 1 else 0)  // 1 para encendido, 0 para apagado
+            put("TimeOn", timeOn)
+        }
+        db.update("Dispositivos", contentValues, "NumeroSerie = ?", arrayOf(numeroSerie.toString()))
+        db.close()
+    }
+
+    fun getTimeOn(numeroSerie: Int): Long {
+        val db = dbHelper.readableDatabase
+        var timeOn: Long = 0
+        val cursor = db.rawQuery("SELECT TimeOn FROM Dispositivos WHERE NumeroSerie = ?", arrayOf(numeroSerie.toString()))
+        if (cursor.moveToFirst()) {
+            timeOn = cursor.getLong(cursor.getColumnIndexOrThrow("TimeOn"))
+        }
+        cursor.close()
+        db.close()
+        return timeOn
+    }
+
+    fun recordDeviceUsage(numeroSerie: Int, startTime: Long, elapsedTime: Int) {
+        val db = dbHelper.writableDatabase
+        val contentValues = ContentValues().apply {
+            put("NSerie", numeroSerie)
+            put("FechaDeEncendido", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(startTime)))
+            put("TiempoEncendido", elapsedTime)
+        }
+        db.insert("TiempoEncendido", null, contentValues)
+        db.close()
+    }
+
 
     // Clase de dispositivo que incluye la descripción, tipo y número de serie
     data class Device(val description: String, val tipo: String, val numeroSerie: Int)

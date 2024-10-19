@@ -40,7 +40,10 @@ class HomeActivity : AppCompatActivity() {
 
 
         binding.exitButton.setOnClickListener {
-            finishAffinity()
+            val intent = Intent(this, DeviceControlActivity::class.java).apply {
+                putExtra("username", currentUser)
+            }
+            startActivity(intent)
         }
     }
 }
