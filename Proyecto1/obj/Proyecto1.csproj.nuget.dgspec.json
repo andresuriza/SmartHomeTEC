@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj": {}
+    "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj": {
+    "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
+        "projectUniqueName": "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
         "projectName": "Proyecto1",
-        "projectPath": "C:\\Users\\uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
-        "packagesPath": "C:\\Users\\uriza\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\obj\\",
+        "projectPath": "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\Proyecto1.csproj",
+        "packagesPath": "C:\\Users\\Uriza\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Uriza\\Documents\\TEC\\Bases\\SmartHomeTEC\\Proyecto1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\uriza\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Uriza\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -52,13 +52,13 @@
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.8, )"
+              "version": "[8.0.10, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.8, )"
+              "version": "[8.0.10, )"
             },
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
@@ -92,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
