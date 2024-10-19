@@ -388,53 +388,74 @@ class DatabaseManager(private val context: Context) {
         }
         return devicesList
     }
-    fun updateDeviceStatus(numeroSerie: Int, isOn: Boolean, timeOn: Long) {
-        val db = dbHelper.writableDatabase
-        val contentValues = ContentValues().apply {
-            put("IsOn", if (isOn) 1 else 0)  // 1 para encendido, 0 para apagado
-            put("TimeOn", timeOn)
-        }
-        db.update("Dispositivos", contentValues, "NumeroSerie = ?", arrayOf(numeroSerie.toString()))
-        db.close()
-    }
 
-    fun getTimeOn(numeroSerie: Int): Long {
-        val db = dbHelper.readableDatabase
-        var timeOn: Long = 0
-        val cursor = db.rawQuery("SELECT TimeOn FROM Dispositivos WHERE NumeroSerie = ?", arrayOf(numeroSerie.toString()))
-        if (cursor.moveToFirst()) {
-            timeOn = cursor.getLong(cursor.getColumnIndexOrThrow("TimeOn"))
-        }
-        cursor.close()
-        db.close()
-        return timeOn
-    }
 
-    fun recordDeviceUsage(numeroSerie: Int, startTime: Long, elapsedTime: Int) {
+    fun recordStartTime(numeroSerie: Int, startTime: Long) {
         val db = dbHelper.writableDatabase
         val contentValues = ContentValues().apply {
             put("NSerie", numeroSerie)
-            put("FechaDeEncendido", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(startTime)))
-            put("TiempoEncendido", elapsedTime)
+            put("FechaDeEncendido", SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date(startTime)))
+            putNull("TiempoEncendido")
         }
         db.insert("TiempoEncendido", null, contentValues)
         db.close()
     }
 
+    // Obtener el tiempo de encendido (Fecha y hora de encendido)
+    fun getStartTime(numeroSerie: Int): Long {
+        val db = dbHelper.readableDatabase
+        var startTime: Long = 0
+        val cursor = db.rawQuery("SELECT FechaDeEncendido FROM TiempoEncendido WHERE NSerie = ? AND TiempoEncendido IS NULL", arrayOf(numeroSerie.toString()))
+        if (cursor.moveToFirst()) {
+            val dateString = cursor.getString(cursor.getColumnIndexOrThrow("FechaDeEncendido"))
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+            startTime = dateFormat.parse(dateString).time
+        }
+        cursor.close()
+        db.close()
+        return startTime
+    }
+
+    // Registrar el tiempo total encendido cuando se apaga el dispositivo
+    fun recordDeviceUsage(numeroSerie: Int, elapsedTime: Int) {
+        val db = dbHelper.writableDatabase
+        val contentValues = ContentValues().apply {
+            put("TiempoEncendido", elapsedTime) // Guardar el tiempo total que estuvo encendido
+        }
+        db.update("TiempoEncendido", contentValues, "NSerie = ? AND TiempoEncendido IS NULL", arrayOf(numeroSerie.toString()))
+        db.close()
+    }
+
+    // Verificar si el dispositivo está encendido
+    fun isDeviceOn(numeroSerie: Int): Boolean {
+        val db = dbHelper.readableDatabase
+        var isOn = false
+        val cursor = db.rawQuery("SELECT FechaDeEncendido FROM TiempoEncendido WHERE NSerie = ? AND TiempoEncendido IS NULL", arrayOf(numeroSerie.toString()))
+        if (cursor.moveToFirst()) {
+            isOn = true // Si hay una fecha de encendido y no hay tiempo registrado, está encendido
+        }
+        cursor.close()
+        db.close()
+        return isOn
+    }
+
+
+
+
 
     // Clase de dispositivo que incluye la descripción, tipo y número de serie
     data class Device(val description: String, val tipo: String, val numeroSerie: Int)
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
