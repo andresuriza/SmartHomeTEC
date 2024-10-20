@@ -86,7 +86,7 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
     }
 
 
-    fun getAposentosByUser(username: String): List<String> {
+ /*   fun getAposentosByUser(username: String): List<String> {
         val aposentosList = mutableListOf<String>()
         val db = dbHelper.readableDatabase
         try {
@@ -104,7 +104,37 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
             db.close()
         }
         return aposentosList
-    }
+    }*/
+ fun getAposentosByUser(username: String): List<String> {
+     val aposentosList = mutableListOf<String>()
+     val db = dbHelper.readableDatabase
+     try {
+         val cursor = db.rawQuery("SELECT Nombre FROM Aposentos WHERE UsuarioAso = ?", arrayOf(username))
+         if (cursor.moveToFirst()) {
+             do {
+                 aposentosList.add(cursor.getString(0))
+             } while (cursor.moveToNext())
+         }
+         cursor.close()
+
+         // Si no hay aposentos, agregar predeterminados
+         if (aposentosList.isEmpty()) {
+             // Aposentos predeterminados
+             val defaultAposentos = listOf("Dormitorio", "Cocina", "Sala", "Comedor")
+             for (aposento in defaultAposentos) {
+                 addAposento(aposento, username) // Agregar a la base de datos
+                 aposentosList.add(aposento) // Agregar a la lista
+             }
+             Toast.makeText(context, "Se han agregado aposentos predeterminados", Toast.LENGTH_SHORT).show()
+         }
+     } catch (e: Exception) {
+         Log.e("DatabaseManager", "Error fetching Aposentos: ${e.message}")
+     } finally {
+         db.close()
+     }
+     return aposentosList
+ }
+
 
 
     fun addAposento(nombre: String, usuarioAso: String) {
@@ -437,38 +467,136 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
         }
         return devicesList
     }
-    fun updateDeviceStatus(numeroSerie: Int, isOn: Boolean, timeOn: Long) {
-        val db = dbHelper.writableDatabase
-        val contentValues = ContentValues().apply {
-            put("IsOn", if (isOn) 1 else 0)  // 1 para encendido, 0 para apagado
-            put("TimeOn", timeOn)
-        }
-        db.update("Dispositivos", contentValues, "NumeroSerie = ?", arrayOf(numeroSerie.toString()))
-        db.close()
-    }
 
-    fun getTimeOn(numeroSerie: Int): Long {
-        val db = dbHelper.readableDatabase
-        var timeOn: Long = 0
-        val cursor = db.rawQuery("SELECT TimeOn FROM Dispositivos WHERE NumeroSerie = ?", arrayOf(numeroSerie.toString()))
-        if (cursor.moveToFirst()) {
-            timeOn = cursor.getLong(cursor.getColumnIndexOrThrow("TimeOn"))
-        }
-        cursor.close()
-        db.close()
-        return timeOn
-    }
 
-    fun recordDeviceUsage(numeroSerie: Int, startTime: Long, elapsedTime: Int) {
+    fun recordStartTime(numeroSerie: Int, startTime: Long) {
         val db = dbHelper.writableDatabase
         val contentValues = ContentValues().apply {
             put("NSerie", numeroSerie)
-            put("FechaDeEncendido", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(startTime)))
-            put("TiempoEncendido", elapsedTime)
+            put("FechaDeEncendido", SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date(startTime)))
+            putNull("TiempoEncendido")
         }
         db.insert("TiempoEncendido", null, contentValues)
         db.close()
     }
+
+    // Obtener el tiempo de encendido (Fecha y hora de encendido)
+    fun getStartTime(numeroSerie: Int): Long {
+        val db = dbHelper.readableDatabase
+        var startTime: Long = 0
+        val cursor = db.rawQuery("SELECT FechaDeEncendido FROM TiempoEncendido WHERE NSerie = ? AND TiempoEncendido IS NULL", arrayOf(numeroSerie.toString()))
+        if (cursor.moveToFirst()) {
+            val dateString = cursor.getString(cursor.getColumnIndexOrThrow("FechaDeEncendido"))
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+            startTime = dateFormat.parse(dateString).time
+        }
+        cursor.close()
+        db.close()
+        return startTime
+    }
+
+    // Registrar el tiempo total encendido cuando se apaga el dispositivo
+    fun recordDeviceUsage(numeroSerie: Int, elapsedTime: Int) {
+        val db = dbHelper.writableDatabase
+        val contentValues = ContentValues().apply {
+            put("TiempoEncendido", elapsedTime) // Guardar el tiempo total que estuvo encendido
+        }
+        db.update("TiempoEncendido", contentValues, "NSerie = ? AND TiempoEncendido IS NULL", arrayOf(numeroSerie.toString()))
+        db.close()
+    }
+
+    // Verificar si el dispositivo está encendido
+    fun isDeviceOn(numeroSerie: Int): Boolean {
+        val db = dbHelper.readableDatabase
+        var isOn = false
+        val cursor = db.rawQuery("SELECT FechaDeEncendido FROM TiempoEncendido WHERE NSerie = ? AND TiempoEncendido IS NULL", arrayOf(numeroSerie.toString()))
+        if (cursor.moveToFirst()) {
+            isOn = true // Si hay una fecha de encendido y no hay tiempo registrado, está encendido
+        }
+        cursor.close()
+        db.close()
+        return isOn
+    }
+    //Obtener Dispositivos asociados a un aposento
+    fun getDevicesForAposento(username: String, aposento: String): List<Device> {
+        val devicesList = mutableListOf<Device>()
+        val db = dbHelper.readableDatabase
+        try {
+            val cursor = db.rawQuery(
+                """
+            SELECT d.Descripcion, d.NumeroSerie, t.Nombre 
+            FROM Dispositivos d 
+            INNER JOIN Tipo t ON d.IDTipo = t.ID
+            WHERE d.UsuarioAso = ? AND d.IdAposento = (SELECT ID FROM Aposentos WHERE Nombre = ?)
+            """, arrayOf(username, aposento)//Se hace un JOIN para obtener el nombre del tipo de dispositivo, y se filtra por el aposento
+            )
+
+            if (cursor.moveToFirst()) {
+                do {
+                    val description = cursor.getString(cursor.getColumnIndexOrThrow("Descripcion"))
+                    val serialNumber = cursor.getInt(cursor.getColumnIndexOrThrow("NumeroSerie"))
+                    val tipo = cursor.getString(cursor.getColumnIndexOrThrow("Nombre"))
+
+                    devicesList.add(Device(description, tipo, serialNumber))
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching Devices for Aposento: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return devicesList
+    }
+    fun deleteDevice(numeroSerie: Int) {
+        val db = dbHelper.writableDatabase
+        try {
+            db.delete("Dispositivos", "NumeroSerie = ?", arrayOf(numeroSerie.toString()))
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error deleting device: ${e.message}")
+        } finally {
+            db.close()
+        }
+    }
+    fun getUserInfo(correo: String): Usuario {
+        val db = dbHelper.readableDatabase
+        var usuario: Usuario? = null
+
+        try {
+            val cursor = db.rawQuery("SELECT * FROM Cliente WHERE correo = ?", arrayOf(correo))
+            if (cursor.moveToFirst()) {
+                val correo = cursor.getString(cursor.getColumnIndexOrThrow("correo"))
+                val password = cursor.getString(cursor.getColumnIndexOrThrow("password"))
+                val region = cursor.getString(cursor.getColumnIndexOrThrow("region"))
+                val nombre = cursor.getString(cursor.getColumnIndexOrThrow("Nombre"))
+                val apellido1 = cursor.getString(cursor.getColumnIndexOrThrow("Apellido1"))
+                val apellido2 = cursor.getString(cursor.getColumnIndexOrThrow("Apellido2"))
+
+                usuario = Usuario(correo, password, region, nombre, apellido1, apellido2)
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching user info: ${e.message}")
+        } finally {
+            db.close()
+        }
+
+        return usuario ?: throw Exception("Usuario no encontrado")
+    }
+    data class Usuario(
+        val correo: String,
+        val password: String,
+        val region: String,
+        val nombre: String,
+        val apellido1: String,
+        val apellido2: String
+    )
+
+
+
+
+
+
 
 
     // Clase de dispositivo que incluye la descripción, tipo y número de serie
@@ -476,14 +604,17 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
 
 
 
-
-
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
