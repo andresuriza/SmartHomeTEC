@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.smarthometec.Sync
 
+// Clase que carga la primera pantalla a mostrar
 class MainActivity : AppCompatActivity() {
     private lateinit var databaseManager: DatabaseManager
     
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Icono de sincronizacion
         syncButton.setOnClickListener {
             if (Sync.isOnline) {
                 syncButton.setImageResource(R.drawable.stop_sync)

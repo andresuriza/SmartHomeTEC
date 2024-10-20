@@ -9,6 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 
+// Crea api de Retrofit
 object RetrofitInstance {
     val api: UserService by lazy {
         Retrofit.Builder()

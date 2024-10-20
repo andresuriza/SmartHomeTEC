@@ -8,10 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.samrthometec.databinding.ActivityHomeBinding
 import com.example.smarthometec.Sync
 
+// Pantalla de inicio
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var currentUser: String
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,17 +68,5 @@ class HomeActivity : AppCompatActivity() {
             }
             Sync.isOnline = !Sync.isOnline
         }
-
-//        syncButton.setOnClickListener {
-////            if (Sync.isOnline) {
-////                syncButton.setImageResource(R.drawable.stop_sync)
-//                Toast.makeText(this, "Sync disabled", Toast.LENGTH_SHORT).show()
-////            }
-////            else {
-////                syncButton.setImageResource(R.drawable.sync_icon )
-////                Toast.makeText(this, "Sync enabled", Toast.LENGTH_SHORT).show()
-////            }
-////            Sync.isOnline = !Sync.isOnline
-//        }
     }
 }

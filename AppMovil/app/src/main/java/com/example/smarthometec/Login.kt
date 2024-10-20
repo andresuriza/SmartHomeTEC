@@ -11,8 +11,8 @@ import com.example.samrthometec.databinding.ActivityLoginBinding
 import android.database.sqlite.SQLiteDatabase
 import com.example.samrthometec.DatabaseManager
 
+// Pantalla de login
 class Login : AppCompatActivity() {
-
     private lateinit var binding: ActivityLoginBinding
 
     //  private lateinit var db: SQLiteDatabase  // Base de datos SQLite

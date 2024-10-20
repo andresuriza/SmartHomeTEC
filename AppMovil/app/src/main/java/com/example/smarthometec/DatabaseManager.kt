@@ -23,6 +23,7 @@ import java.util.Locale
 
 const val TAG = "DatabaseManager"
 
+// Maneja las funciones de bases de datos
 class DatabaseManager(private val context: Context) : AppCompatActivity() {
     private val dbHelper = MyDatabaseHelper(context)
 
@@ -85,26 +86,6 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
         Log.d("DatabaseManager", "Database copied to: $destinationFilePath")
     }
 
-
- /*   fun getAposentosByUser(username: String): List<String> {
-        val aposentosList = mutableListOf<String>()
-        val db = dbHelper.readableDatabase
-        try {
-            val cursor =
-                db.rawQuery("SELECT Nombre FROM Aposentos WHERE UsuarioAso = ?", arrayOf(username))
-            if (cursor.moveToFirst()) {
-                do {
-                    aposentosList.add(cursor.getString(0))
-                } while (cursor.moveToNext())
-            }
-            cursor.close()
-        } catch (e: Exception) {
-            Log.e("DatabaseManager", "Error fetching Aposentos: ${e.message}")
-        } finally {
-            db.close()
-        }
-        return aposentosList
-    }*/
  fun getAposentosByUser(username: String): List<String> {
      val aposentosList = mutableListOf<String>()
      val db = dbHelper.readableDatabase
@@ -136,7 +117,7 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
  }
 
 
-
+// Agrega aposento
     fun addAposento(nombre: String, usuarioAso: String) {
         val db = dbHelper.writableDatabase
         try {
@@ -171,6 +152,7 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
         }
     }
 
+    // Agrega usuarios
     fun addUser() {
         var usuario: List<Users>
 
@@ -210,8 +192,6 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
     }
 
     // Método para verificar si un usuario existe en la base de datos
-
-
     fun checkUser(username: String, password: String): Boolean {
         val db = dbHelper.readableDatabase
         var exists = false
@@ -230,6 +210,8 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
         return exists
 
     }
+
+    // Agrega dispositivos
     fun addDevice(description: String, typeId: Int, brand: Int, serialNumber: Int, consumption: Int, roomId: Int, username: String, Fecha: String, FechaGarantia: String) {
         val db = dbHelper.writableDatabase
         try {
@@ -258,6 +240,7 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
 
     }
 
+    // Obtiene los dispositivos por usuario
     fun getDevicesByUser(username: String): List<String> {
         val devicesList = mutableListOf<String>()
         val db = dbHelper.readableDatabase
@@ -281,6 +264,7 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
         return devicesList
     }
 
+    // Obtiene marcas de dispositivos
     fun getAllBrands(): List<Brand> {
         val brands = mutableListOf<Brand>()
         val db = dbHelper.readableDatabase
@@ -374,6 +358,7 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
         return guaranteePeriod
     }
 
+    // Funcion que transfiere dispositivo
     fun transferDevice(deviceString: String, currentUser: String, newOwner: String) {
         val db = dbHelper.writableDatabase
         try {
@@ -592,18 +577,8 @@ class DatabaseManager(private val context: Context) : AppCompatActivity() {
         val apellido2: String
     )
 
-
-
-
-
-
-
-
     // Clase de dispositivo que incluye la descripción, tipo y número de serie
     data class Device(val description: String, val tipo: String, val numeroSerie: Int)
-
-
-
 }
 
 

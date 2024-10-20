@@ -2,6 +2,7 @@ package com.example.smarthometec
 
 import com.google.gson.annotations.SerializedName
 
+// Define clase de usuario para Json
 data class Users (
     val apellidos: String,
     val contrasena: String,
@@ -15,23 +16,10 @@ data class Users (
     val region: String
 )
 
-data class UserRegister (
-    @SerializedName("nombre")
+data class Producto(
+    val distribuidorCedula: String,
+    val id: Int,
     val nombre: String,
-    @SerializedName("apellidos")
-    val apellidos: String,
-    @SerializedName("region")
-    val region: String,
-    @SerializedName("correoElectronico")
-    val correoElectronico: String,
-    @SerializedName("contrasena")
-    val contrasena: String,
-    @SerializedName("pedidos")
-    val pedidos: List<Int>,
-    @SerializedName("facturas")
-    val facturas: List<Int>,
-    @SerializedName("dispositivos")
-    val dispositivos: List<Int>,
-    @SerializedName("direccionesEntrega")
-    val direccionesEntrega: List<Int>
+    val numeroSerieDispositivo: String,
+    val precio: Double
 )
