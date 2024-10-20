@@ -33,7 +33,7 @@ function ManageStore() {
         for (const product of jsonData) {
           if (product.Nombre && product.DistribuidorCedula && product.Precio) {
             try {
-              const response = await fetch('https://localhost:5555/api/Producto', {
+              const response = await fetch('http://localhost:9095/api/Producto', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(product),

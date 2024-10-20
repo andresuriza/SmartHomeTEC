@@ -48,9 +48,7 @@ function Navbar() {
         <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
           SmartHomeTEC
         </Link>
-        <div className="menu-icon" onClick={handleClick}>
-          <i className={click ? "fas fa-times" : "fas fa-bars"} />
-        </div>
+        
         {loggedIn ? (  // Mostrar solo si el usuario ha iniciado sesión
           <ul className={click ? "nav-menu active" : "nav-menu"}>
             <li>

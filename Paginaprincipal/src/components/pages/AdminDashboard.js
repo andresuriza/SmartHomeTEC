@@ -78,7 +78,7 @@ export default function AdminDashboard() {
   };
   const fetchDevices = async () => {
     try {
-      const response = await fetch('https://localhost:5555/api/Dispositivos');
+      const response = await fetch('http://localhost:9095/api/Dispositivos');
       const data = await response.json();
       setDevices(data);
     } catch (error) {
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
 
   const fetchDeviceTypes = async () => {
     try {
-      const response = await fetch('https://localhost:5555/api/TipoDispositivo');
+      const response = await fetch('http://localhost:9095/api/TipoDispositivo');
       const data = await response.json();
       setDeviceTypes(data);
     } catch (error) {
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
 
   const fetchDistributors = async () => {
     try {
-      const response = await fetch('https://localhost:5555/api/Distribuidor');
+      const response = await fetch('http://localhost:9095/api/Distribuidor');
       const data = await response.json();
       setDistributors(data);
     } catch (error) {
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
 
   const fetchDevicesByRegion = async () => {
     try {
-      const response = await fetch('https://localhost:5555/api/Producto/dispositivos-por-region');
+      const response = await fetch('http://localhost:9095/api/Producto/dispositivos-por-region');
       const data = await response.json();
       
       setDevicesByRegionData(data);
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      const response = await fetch('https://localhost:5555/api/Dispositivos', {
+      const response = await fetch('http://localhost:9095/api/Dispositivos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      const response = await fetch(`https://localhost:5555/api/Dispositivos/${newDevice.serialNumber}`, {
+      const response = await fetch(`http://localhost:9095/api/Dispositivos/${newDevice.serialNumber}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      const response = await fetch('https://localhost:5555/api/TipoDispositivo', {
+      const response = await fetch('http://localhost:9095/api/TipoDispositivo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      const response = await fetch(`https://localhost:5555/api/TipoDispositivo/${newDeviceType.id}`, {
+      const response = await fetch(`http://localhost:9095/api/TipoDispositivo/${newDeviceType.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -328,7 +328,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      const response = await fetch('https://localhost:5555/api/Distribuidor', {
+      const response = await fetch('http://localhost:9095/api/Distribuidor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -371,7 +371,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      const response = await fetch(`https://localhost:5555/api/Distribuidor/${newDistributor.juridicalId}`, {
+      const response = await fetch(`http://localhost:9095/api/Distribuidor/${newDistributor.juridicalId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

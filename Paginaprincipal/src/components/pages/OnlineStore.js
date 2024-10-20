@@ -18,7 +18,7 @@ function OnlineStore() {
       console.log("Intentando obtener la región del usuario...");
       if (user && user.userId) {
         try {
-          const response = await fetch(`https://localhost:5555/api/users/${user.userId}/details`, {
+          const response = await fetch(`http://localhost:9095/api/users/${user.userId}/details`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -55,7 +55,7 @@ function OnlineStore() {
     const fetchProductos = async () => {
       if (userRegion) {
         try {
-          const response = await fetch(`https://localhost:5555/api/Producto/por-region/${userRegion}`); // Llamada actualizada para filtrar por región
+          const response = await fetch(`http://localhost:9095/api/Producto/por-region/${userRegion}`); // Llamada actualizada para filtrar por región
           if (!response.ok) throw new Error('Error al obtener productos');
           const data = await response.json();
           setProductos(data);

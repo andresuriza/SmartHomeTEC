@@ -29,19 +29,21 @@ export default function Registrarse() {
   // Función para enviar los datos a la API
   const handleClick = async () => {
     try {
-      const response = await fetch("https://localhost:5555/api/users", {
+      const response = await fetch("http://localhost:9095/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Nombre: formData.nombre,
-          Apellidos: formData.apellido1 + " " + formData.apellido2,
-          Region: formData.continente + " - " + formData.pais,
-          CorreoElectronico: formData.email,
-          Contraseña: formData.password,
-          DireccionEntrega: formData.direccion,
-          Dispositivos: [] // Asumo que no se envían dispositivos en el registro inicial
+          nombre: formData.nombre,
+          apellidos: formData.apellido1 + " " + formData.apellido2,
+          region: formData.continente + " - " + formData.pais, // Adjust if "continente - pais" is not expected
+          correoElectronico: formData.email,
+          contrasena: formData.password,
+          pedidos: [], // Add as needed
+          facturas: [], // Add as needed
+          dispositivos: [], // Assuming empty initially
+          direccionesEntrega: [] // Adjust if necessary, it's plural in your example
         })
       });
 

@@ -37,7 +37,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchProductoDetalles = async () => {
       try {
-        const response = await fetch(`https://localhost:5555/api/Producto/detalles/${id}`);
+        const response = await fetch(`http://localhost:9095/api/Producto/detalles/${id}`);
         if (!response.ok) throw new Error('Error al obtener detalles del producto');
         const detalles = await response.json();
         setProductoDetalles(detalles);
@@ -51,7 +51,7 @@ function ProductDetails() {
 
     const fetchDispositivosRelacionados = async () => {
       try {
-        const response = await fetch(`https://localhost:5555/api/Producto/${id}/relacionados`);
+        const response = await fetch(`http://localhost:9095/api/Producto/${id}/relacionados`);
         if (!response.ok) throw new Error('Error al obtener dispositivos relacionados');
         const relacionados = await response.json();
         setDispositivosRelacionados(relacionados.slice(0, 10)); // Limitar a 10 productos
