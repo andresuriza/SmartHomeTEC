@@ -76,7 +76,7 @@ class DatabaseManager(private val context: Context) {
     }
 
 
-    fun getAposentosByUser(username: String): List<String> {
+ /*   fun getAposentosByUser(username: String): List<String> {
         val aposentosList = mutableListOf<String>()
         val db = dbHelper.readableDatabase
         try {
@@ -94,7 +94,37 @@ class DatabaseManager(private val context: Context) {
             db.close()
         }
         return aposentosList
-    }
+    }*/
+ fun getAposentosByUser(username: String): List<String> {
+     val aposentosList = mutableListOf<String>()
+     val db = dbHelper.readableDatabase
+     try {
+         val cursor = db.rawQuery("SELECT Nombre FROM Aposentos WHERE UsuarioAso = ?", arrayOf(username))
+         if (cursor.moveToFirst()) {
+             do {
+                 aposentosList.add(cursor.getString(0))
+             } while (cursor.moveToNext())
+         }
+         cursor.close()
+
+         // Si no hay aposentos, agregar predeterminados
+         if (aposentosList.isEmpty()) {
+             // Aposentos predeterminados
+             val defaultAposentos = listOf("Dormitorio", "Cocina", "Sala", "Comedor")
+             for (aposento in defaultAposentos) {
+                 addAposento(aposento, username) // Agregar a la base de datos
+                 aposentosList.add(aposento) // Agregar a la lista
+             }
+             Toast.makeText(context, "Se han agregado aposentos predeterminados", Toast.LENGTH_SHORT).show()
+         }
+     } catch (e: Exception) {
+         Log.e("DatabaseManager", "Error fetching Aposentos: ${e.message}")
+     } finally {
+         db.close()
+     }
+     return aposentosList
+ }
+
 
 
     fun addAposento(nombre: String, usuarioAso: String) {
@@ -438,6 +468,37 @@ class DatabaseManager(private val context: Context) {
         db.close()
         return isOn
     }
+    fun getDevicesForAposento(username: String, aposento: String): List<Device> {
+        val devicesList = mutableListOf<Device>()
+        val db = dbHelper.readableDatabase
+        try {
+            val cursor = db.rawQuery(
+                """
+            SELECT d.Descripcion, d.NumeroSerie, t.Nombre 
+            FROM Dispositivos d 
+            INNER JOIN Tipo t ON d.IDTipo = t.ID
+            WHERE d.UsuarioAso = ? AND d.IdAposento = (SELECT ID FROM Aposentos WHERE Nombre = ?)
+            """, arrayOf(username, aposento)
+            )
+
+            if (cursor.moveToFirst()) {
+                do {
+                    val description = cursor.getString(cursor.getColumnIndexOrThrow("Descripcion"))
+                    val serialNumber = cursor.getInt(cursor.getColumnIndexOrThrow("NumeroSerie"))
+                    val tipo = cursor.getString(cursor.getColumnIndexOrThrow("Nombre"))
+
+                    devicesList.add(Device(description, tipo, serialNumber))
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching Devices for Aposento: ${e.message}")
+        } finally {
+            db.close()
+        }
+        return devicesList
+    }
+
 
 
 

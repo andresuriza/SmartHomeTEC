@@ -40,7 +40,7 @@ class DeviceControlActivity : AppCompatActivity() {
         binding.turnOffButton.setOnClickListener {
             val selectedDevice = binding.deviceSpinner.selectedItem as DeviceStatus?
             selectedDevice?.let { device ->
-                if (dbManager.isDeviceOn(device.numeroSerie)) { // Comprobar si el dispositivo está encendido
+                if (dbManager.isDeviceOn(device.numeroSerie)) { 
                     turnOffDevice(device)
                 } else {
                     Toast.makeText(this, "El dispositivo ya está apagado", Toast.LENGTH_SHORT).show()
