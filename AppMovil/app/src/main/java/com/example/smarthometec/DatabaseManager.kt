@@ -6,14 +6,24 @@ import android.content.Context
 import android.content.ContentValues
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.smarthometec.RetrofitInstance
+import com.example.smarthometec.Sync
+import com.example.smarthometec.Users
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DatabaseManager(private val context: Context) {
+const val TAG = "DatabaseManager"
+
+class DatabaseManager(private val context: Context) : AppCompatActivity() {
     private val dbHelper = MyDatabaseHelper(context)
 
     init {
@@ -131,6 +141,44 @@ class DatabaseManager(private val context: Context) {
         }
     }
 
+    fun addUser() {
+        var usuario: List<Users>
+
+        if (Sync.isOnline) {
+            val db = dbHelper.writableDatabase
+
+            lifecycleScope.launch {
+                val response = try {
+                    RetrofitInstance.api.getUsers()
+                } catch (e: IOException) {
+                    Log.e(TAG, "IOException, you might not have internet")
+                    return@launch
+                } catch (e: HttpException) {
+                    Log.e(TAG, "HTTP Exception, error in api")
+                    return@launch
+                }
+                if (response.isSuccessful && response.body() != null) {
+                    usuario = response.body()!!
+
+                    for (u in usuario) {
+                        val values = ContentValues().apply {
+                            put("correo", u.correoElectronico)
+                            put("password", u.contrasena)
+                            put("region", u.region)
+                            put("Nombre", u.nombre)
+                            put("Apellido1", u.apellidos)
+                            put("Apellido2", "") // CAMBIAR EN POSTGRES
+                        }
+
+                        db.insert("Cliente", null, values)
+                    }
+                } else {
+                    Log.e(TAG, "Response not successful")
+                }
+            }
+        }
+    }
+
     // Método para verificar si un usuario existe en la base de datos
 
 
@@ -177,6 +225,7 @@ class DatabaseManager(private val context: Context) {
         } finally {
             db.close()
         }
+
     }
 
     fun getDevicesByUser(username: String): List<String> {

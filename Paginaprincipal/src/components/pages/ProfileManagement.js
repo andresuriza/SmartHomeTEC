@@ -35,7 +35,7 @@ export default function ProfileManagement() {
     const fetchUserData = async () => {
       try {
         if (user && user.userId) {
-          const response = await fetch(`https://localhost:5555/api/users/${user.userId}/details`, {
+          const response = await fetch(`http://localhost:9095/api/users/${user.userId}/details`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export default function ProfileManagement() {
   const handleAddAddressSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://localhost:5555/api/users/${user.userId}/addAddress`, {
+      const response = await fetch(`http://localhost:9095/api/users/${user.userId}/addAddress`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,7 @@ export default function ProfileManagement() {
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://localhost:5555/api/users/${user.userId}/updateAddress/${newAddress.id}`, {
+      const response = await fetch(`http://localhost:9095/api/users/${user.userId}/updateAddress/${newAddress.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -165,7 +165,7 @@ export default function ProfileManagement() {
     e.preventDefault();
     if (newPassword === confirmPassword) {
       try {
-        const response = await fetch(`https://localhost:5555/api/users/${user.userId}/updatePassword`, {
+        const response = await fetch(`http://localhost:9095/api/users/${user.userId}/updatePassword`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -195,7 +195,7 @@ export default function ProfileManagement() {
 const handleProfileSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://localhost:5555/api/users/${user.userId}/updateProfile`, {
+      const response = await fetch(`http://localhost:9095/api/users/${user.userId}/updateProfile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
