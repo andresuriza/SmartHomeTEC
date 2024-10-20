@@ -47,6 +47,12 @@ class DeviceControlActivity : AppCompatActivity() {
                 }
             }
         }
+        binding.deleteDeviceButton.setOnClickListener {
+            val selectedDevice = binding.deleteDeviceSpinner.selectedItem as DeviceStatus?
+            selectedDevice?.let { device ->
+                deleteDevice(device)
+            }
+        }
     }
 
     // Cargar dispositivos del usuario actual
@@ -58,7 +64,12 @@ class DeviceControlActivity : AppCompatActivity() {
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, deviceMap)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, deviceMap)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.deviceSpinner.adapter = adapter
+        binding.deleteDeviceSpinner.adapter = adapter2
+
+
     }
 
     // Encender el dispositivo
@@ -79,6 +90,11 @@ class DeviceControlActivity : AppCompatActivity() {
         dbManager.recordDeviceUsage(device.numeroSerie, elapsedTimeInSeconds.toInt())
 
         Toast.makeText(this, "Dispositivo apagado, tiempo registrado", Toast.LENGTH_SHORT).show()
+    }
+    private fun deleteDevice(device: DeviceStatus) {
+        dbManager.deleteDevice(device.numeroSerie) // Llamar al método para eliminar el dispositivo
+        loadDevices() // Recargar dispositivos
+        Toast.makeText(this, "Dispositivo eliminado", Toast.LENGTH_SHORT).show()
     }
 
     // Clase para representar el estado de un dispositivo

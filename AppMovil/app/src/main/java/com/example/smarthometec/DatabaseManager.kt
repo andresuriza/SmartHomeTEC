@@ -468,6 +468,7 @@ class DatabaseManager(private val context: Context) {
         db.close()
         return isOn
     }
+    //Obtener Dispositivos asociados a un aposento
     fun getDevicesForAposento(username: String, aposento: String): List<Device> {
         val devicesList = mutableListOf<Device>()
         val db = dbHelper.readableDatabase
@@ -478,7 +479,7 @@ class DatabaseManager(private val context: Context) {
             FROM Dispositivos d 
             INNER JOIN Tipo t ON d.IDTipo = t.ID
             WHERE d.UsuarioAso = ? AND d.IdAposento = (SELECT ID FROM Aposentos WHERE Nombre = ?)
-            """, arrayOf(username, aposento)
+            """, arrayOf(username, aposento)//Se hace un JOIN para obtener el nombre del tipo de dispositivo, y se filtra por el aposento
             )
 
             if (cursor.moveToFirst()) {
@@ -497,6 +498,16 @@ class DatabaseManager(private val context: Context) {
             db.close()
         }
         return devicesList
+    }
+    fun deleteDevice(numeroSerie: Int) {
+        val db = dbHelper.writableDatabase
+        try {
+            db.delete("Dispositivos", "NumeroSerie = ?", arrayOf(numeroSerie.toString()))
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error deleting device: ${e.message}")
+        } finally {
+            db.close()
+        }
     }
 
 
