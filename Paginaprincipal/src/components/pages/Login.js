@@ -53,6 +53,9 @@ export default function Login() {
           // Redirigir a la página de inicio o dashboard
           navigate("/");
         }
+      }  else if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
+        // Si el login es exitoso para el administrador, redirigir al dashboard del administrador
+        navigate("/admin-dashboard");
       } else {
         setErrorMessage(data.message || "Error al iniciar sesión");
       }
