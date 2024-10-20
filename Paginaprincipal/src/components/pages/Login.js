@@ -28,7 +28,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:9095/api/users/login", {
+      const responseAdmin = await fetch("http://localhost:9095/api/administradors/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,25 +39,38 @@ export default function Login() {
         })
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        if (data.userId) {
-          // Usar la función login del contexto para guardar el estado global
-          login({
-            userId: data.userId,
-            nombre: data.nombre,
-            token: data.token // Si tienes un token, también puedes guardarlo
-          });
-          
-          // Redirigir a la página de inicio o dashboard
-          navigate("/");
+      if (responseAdmin.ok) {
+          navigate("/admin-dashboard");
         }
-      }  else if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
-        // Si el login es exitoso para el administrador, redirigir al dashboard del administrador
-        navigate("/admin-dashboard");
-      } else {
-        setErrorMessage(data.message || "Error al iniciar sesión");
+      else {
+        const response = await fetch("http://localhost:9095/api/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          if (data.userId) {
+            // Usar la función login del contexto para guardar el estado global
+            login({
+              userId: data.userId,
+              nombre: data.nombre,
+              token: data.token // Si tienes un token, también puedes guardarlo
+            });
+            
+            // Redirigir a la página de inicio o dashboard
+            navigate("/");
+          } 
+        } else {
+          setErrorMessage(data.message || "Error al iniciar sesión");
+        }
       }
     } catch (error) {
       console.error("Error al conectarse con la API:", error);

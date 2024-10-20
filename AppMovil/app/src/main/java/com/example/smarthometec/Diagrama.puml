@@ -1,0 +1,421 @@
+@startuml
+class HomeActivity {
+    - ActivityHomeBinding binding
+    - String currentUser
+
+    + onCreate(Bundle?)
+}
+
+class ActivityHomeBinding {
+    + inflate(LayoutInflater): ActivityHomeBinding
+    + welcomeTextView : TextView
+    + aposentosButton : Button
+    + gestionDispositivos : Button
+    + transferirDispositivo : Button
+    + exitButton : Button
+    + imageButton : ImageButton
+}
+
+class Aposentos
+class AssociateDeviceActivity
+class TransferDeviceActivity
+class DeviceControlActivity
+class Sync {
+    + isOnline : boolean
+}
+
+class Intent {
+    + putExtra(String, String): Intent
+}
+
+class Toast {
+    + makeText(Context, String, int): Toast
+    + show(): void
+}
+
+class R.drawable {
+    + sync_icon
+    + stop_sync
+}
+
+HomeActivity --> ActivityHomeBinding
+HomeActivity --> Aposentos : "launch Aposentos"
+HomeActivity --> AssociateDeviceActivity : "launch AssociateDeviceActivity"
+HomeActivity --> TransferDeviceActivity : "launch TransferDeviceActivity"
+HomeActivity --> DeviceControlActivity : "launch DeviceControlActivity"
+HomeActivity --> Sync : "sync status"
+HomeActivity --> Intent : "startActivity"
+HomeActivity --> Toast : "show toast message"
+HomeActivity --> R.drawable : "change icon"
+
+class Aposentos {
+    - List<String> aposentosList
+    - DatabaseManager dbManager
+    - String currentUser
+    - ActivityAposentosBinding binding
+
+    + onCreate(Bundle?)
+    - loadAposentos(): void
+}
+
+class ActivityAposentosBinding {
+    + aposentoEditText : EditText
+    + addAposentoButton : Button
+    + aposentosTextView : TextView
+    + homebutton : Button
+}
+
+class DatabaseManager {
+    + addAposento(String, String): void
+    + getAposentosByUser(String): List<String>
+}
+
+class HomeActivity
+
+class Intent {
+    + putExtra(String, String): Intent
+}
+
+class Toast {
+    + makeText(Context, String, int): Toast
+    + show(): void
+}
+
+Aposentos --> ActivityAposentosBinding
+Aposentos --> DatabaseManager : "dbManager"
+Aposentos --> Intent : "start HomeActivity"
+Aposentos --> Toast : "show toast message"
+Aposentos --> HomeActivity : "navigate to HomeActivity"
+
+class AssociateDeviceActivity {
+    - ActivityAssociateDeviceBinding binding
+    - DatabaseManager dbManager
+    - String currentUser
+    - List<String> associatedDevicesList
+    - Map<String, Int> brandIdMap
+    - Map<String, Int> roomIdMap
+    - Map<String, Int> typeIdMap
+
+    + onCreate(Bundle?)
+    - loadBrands(): void
+    - loadRooms(): void
+    - loadAssociatedDevices(): void
+    - loadDeviceTypes(): void
+}
+
+class ActivityAssociateDeviceBinding {
+    + deviceDescriptionEditText : EditText
+    + deviceSerialEditText : EditText
+    + deviceConsumptionEditText : EditText
+    + associateDeviceButton : Button
+    + associatedDevicesTextView : TextView
+    + brandSpinner : Spinner
+    + roomSpinner : Spinner
+    + typeSpinner : Spinner
+}
+
+class DatabaseManager {
+    + getAllBrands(): List<Brand>
+    + getAposentosSpin(String): List<Room>
+    + getDevicesByUser(String): List<String>
+    + getAllDeviceTypes(): List<DeviceType>
+    + addDevice(String, Int, Int, Int, Int, Int, String, String, String): void
+    + getGuaranteePeriodByTypeId(Int): Int
+}
+
+class Brand {
+    + String name
+    + int id
+}
+
+class Room {
+    + String name
+    + int id
+}
+
+class DeviceType {
+    + String name
+    + int id
+}
+
+class Intent {
+    + putExtra(String, String): Intent
+}
+
+class Toast {
+    + makeText(Context, String, int): Toast
+    + show(): void
+}
+
+AssociateDeviceActivity --> ActivityAssociateDeviceBinding
+AssociateDeviceActivity --> DatabaseManager : "dbManager"
+AssociateDeviceActivity --> Intent : "start HomeActivity"
+AssociateDeviceActivity --> Toast : "show toast message"
+AssociateDeviceActivity --> Brand : "load brands"
+AssociateDeviceActivity --> Room : "load rooms"
+AssociateDeviceActivity --> DeviceType : "load device types"
+
+skinparam classAttributeIconSize 0
+
+class DatabaseManager {
+  - Context context
+  - MyDatabaseHelper dbHelper
+  ---
+  + checkDatabase(): Boolean
+  + copyDatabaseIfNeeded(): void
+  + copyDatabaseToLocalFolder(): void
+  + getAposentosByUser(username: String): List<String>
+  + addAposento(nombre: String, usuarioAso: String): void
+  + checkUser(username: String, password: String): Boolean
+  + addDevice(description: String, typeId: Int, brand: Int, serialNumber: Int, consumption: Int, roomId: Int, username: String, Fecha: String, FechaGarantia: String): void
+  + getDevicesByUser(username: String): List<String>
+  + getAllBrands(): List<Brand>
+  + getAposentosSpin(username: String): List<Aposento>
+  + getAllUsersExcept(currentUser: String): List<User>
+  + getAllDeviceTypes(): List<DeviceType>
+  + getGuaranteePeriodByTypeId(typeId: Int): Int
+  + transferDevice(deviceString: String, currentUser: String, newOwner: String): void
+  + getDevicesWithTypeByUser(username: String): List<Device>
+  + updateDeviceStatus(numeroSerie: Int, isOn: Boolean, timeOn: Long): void
+  + getTimeOn(numeroSerie: Int): Long
+  + recordDeviceUsage(numeroSerie: Int, startTime: Long, elapsedTime: Int): void
+}
+
+class MyDatabaseHelper {
+  + onCreate(): void
+  + onUpgrade(): void
+  + getReadableDatabase(): SQLiteDatabase
+  + getWritableDatabase(): SQLiteDatabase
+}
+
+class Brand {
+  + id: Int
+  + name: String
+}
+
+class Aposento {
+  + id: Int
+  + name: String
+}
+
+class User {
+  + username: String
+}
+
+class DeviceType {
+  + id: Int
+  + name: String
+}
+
+class Device {
+  + description: String
+  + tipo: String
+  + numeroSerie: Int
+}
+
+DatabaseManager --> MyDatabaseHelper
+DatabaseManager --> Brand
+DatabaseManager --> Aposento
+DatabaseManager --> User
+DatabaseManager --> DeviceType
+DatabaseManager --> Device
+
+title Device Control Activity UML
+
+class DeviceControlActivity {
+    - ActivityDeviceControlBinding binding
+    - DatabaseManager dbManager
+    - String currentUser
+    - List<DeviceStatus> deviceMap
+
+    + onCreate(Bundle)
+    - loadDevices()
+    - turnOnDevice(DeviceStatus)
+    - turnOffDevice(DeviceStatus)
+}
+
+class DatabaseManager {
+    + getDevicesWithTypeByUser(String): List<Device>
+    + updateDeviceStatus(Int, Boolean, Long)
+    + getTimeOn(Int): Long
+    + recordDeviceUsage(Int, Long, Int)
+}
+
+class DeviceStatus {
+    + Int numeroSerie
+    + String description
+    + Boolean isOn
+    + toString(): String
+}
+
+DeviceControlActivity --> DatabaseManager : uses
+DeviceControlActivity --> DeviceStatus : manages
+DatabaseManager --> Device : returns
+DeviceStatus *-- Device : represents
+
+title Login Activity UML
+
+class Login {
+    - ActivityLoginBinding binding
+    - DatabaseManager databaseManager
+
+    + onCreate(Bundle)
+}
+
+class DatabaseManager {
+    + checkDatabase(): Boolean
+    + checkUser(String, String): Boolean
+}
+
+class ActivityLoginBinding {
+    + EditText username
+    + EditText password
+    + Button loginButton
+}
+
+class HomeActivity {
+    + onCreate(Bundle)
+}
+
+Login --> DatabaseManager : uses
+Login --> ActivityLoginBinding : binds to
+Login --> HomeActivity : redirects to
+
+title MainActivity UML
+
+class MainActivity {
+    - DatabaseManager databaseManager
+
+    + onCreate(Bundle)
+}
+
+class DatabaseManager {
+    + checkDatabase(): Boolean
+    + addUser(): void
+}
+
+class Button {
+    + setOnClickListener(OnClickListener)
+}
+
+class ImageButton {
+    + setOnClickListener(OnClickListener)
+    + setImageResource(int)
+}
+
+class Login {
+    + onCreate(Bundle)
+}
+
+class Sync {
+    + isOnline: Boolean
+}
+
+MainActivity --> DatabaseManager : uses
+MainActivity --> Button : uses
+MainActivity --> ImageButton : uses
+MainActivity --> Login : navigates to
+MainActivity --> Sync : interacts with
+
+title MyDatabaseHelper UML
+
+class MyDatabaseHelper {
+    + MyDatabaseHelper(context: Context)
+    + onCreate(db: SQLiteDatabase): void
+    + onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int): void
+}
+
+class SQLiteOpenHelper {
+    + SQLiteOpenHelper(context: Context, name: String, factory: CursorFactory?, version: Int)
+}
+
+class SQLiteDatabase {
+    + execSQL(sql: String): void
+}
+
+MyDatabaseHelper -|> SQLiteOpenHelper : extends
+MyDatabaseHelper --> SQLiteDatabase : uses
+
+title RetrofitInstance UML
+
+object RetrofitInstance {
+    + api: UserService
+}
+
+class Retrofit {
+    + Builder(): Retrofit.Builder
+}
+
+class GsonConverterFactory {
+    + create(): GsonConverterFactory
+}
+
+class UserService {
+    // Define your service methods here
+}
+
+RetrofitInstance --> Retrofit : uses
+RetrofitInstance --> UserService : creates
+RetrofitInstance --> GsonConverterFactory : uses
+
+title Sync Object UML
+
+object Sync {
+    + isOnline: Boolean
+}
+
+title TransferDeviceActivity Class UML
+
+class TransferDeviceActivity {
+    - binding: ActivityTransferDeviceBinding
+    - dbManager: DatabaseManager
+    - currentUser: String
+    - deviceMap: MutableList<String>
+    - newOwnerIdMap: MutableMap<String, String>
+
+    + onCreate(savedInstanceState: Bundle): Unit
+    - loadDevices(): Unit
+    - loadNewOwners(): Unit
+}
+
+TransferDeviceActivity --> ActivityTransferDeviceBinding
+TransferDeviceActivity --> DatabaseManager
+TransferDeviceActivity --> String
+TransferDeviceActivity --> MutableList
+TransferDeviceActivity --> MutableMap
+
+title Data Classes UML
+
+class Users {
+    - apellidos: String
+    - contrasena: String
+    - correoElectronico: String
+    - direccionesEntrega: List<Any>
+    - dispositivos: List<Any>
+    - facturas: List<Any>
+    - id: Int
+    - nombre: String
+    - pedidos: List<Any>
+    - region: String
+}
+
+class UserRegister {
+    - nombre: String
+    - apellidos: String
+    - region: String
+    - correoElectronico: String
+    - contrasena: String
+    - pedidos: List<Int>
+    - facturas: List<Int>
+    - dispositivos: List<Int>
+    - direccionesEntrega: List<Int>
+}
+
+title UserService Interface UML
+
+interface UserService {
+    + getUsers(): Response<List<Users>>
+    + postRequest(user: UserRegister): UserRegister
+}
+
+@enduml

@@ -10,8 +10,7 @@ import com.example.smarthometec.Sync
 
 class MainActivity : AppCompatActivity() {
     private lateinit var databaseManager: DatabaseManager
-
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

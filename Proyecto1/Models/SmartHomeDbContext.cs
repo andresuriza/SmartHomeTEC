@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Proyecto1.Models;
 
 namespace Proyecto1.Models
 {
@@ -93,5 +94,6 @@ namespace Proyecto1.Models
 
             base.OnModelCreating(modelBuilder);
         }
+        public DbSet<Proyecto1.Models.Administrador> Administrador { get; set; } = default!;
     }
 }
