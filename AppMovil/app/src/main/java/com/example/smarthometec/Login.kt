@@ -47,7 +47,7 @@ class Login : AppCompatActivity() {
             if (databaseManager.checkUser(username, password)) {
                 // Mostrar un mensaje de éxito y redirigir
                 Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, HomeActivity::class.java)
+                val intent = Intent(this, InfoActivity::class.java)
                 intent.putExtra("username", username)
                 // Aquí puedes redirigir a otra actividad si el login es exitoso
                 // startActivity(Intent(this, HomeActivity::class.java))

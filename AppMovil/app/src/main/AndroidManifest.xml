@@ -30,6 +30,7 @@
         <activity android:name=".AssociateDeviceActivity" android:exported="true"/>
         <activity android:name=".TransferDeviceActivity" android:exported="true"/>
         <activity android:name=".DeviceControlActivity" android:exported="true"/>
+        <activity android:name=".InfoActivity" android:exported="true"/>
     </application>
 
   </manifest>

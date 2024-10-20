@@ -509,6 +509,41 @@ class DatabaseManager(private val context: Context) {
             db.close()
         }
     }
+    fun getUserInfo(correo: String): Usuario {
+        val db = dbHelper.readableDatabase
+        var usuario: Usuario? = null
+
+        try {
+            val cursor = db.rawQuery("SELECT * FROM Cliente WHERE correo = ?", arrayOf(correo))
+            if (cursor.moveToFirst()) {
+                val correo = cursor.getString(cursor.getColumnIndexOrThrow("correo"))
+                val password = cursor.getString(cursor.getColumnIndexOrThrow("password"))
+                val region = cursor.getString(cursor.getColumnIndexOrThrow("region"))
+                val nombre = cursor.getString(cursor.getColumnIndexOrThrow("Nombre"))
+                val apellido1 = cursor.getString(cursor.getColumnIndexOrThrow("Apellido1"))
+                val apellido2 = cursor.getString(cursor.getColumnIndexOrThrow("Apellido2"))
+
+                usuario = Usuario(correo, password, region, nombre, apellido1, apellido2)
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("DatabaseManager", "Error fetching user info: ${e.message}")
+        } finally {
+            db.close()
+        }
+
+        return usuario ?: throw Exception("Usuario no encontrado")
+    }
+    data class Usuario(
+        val correo: String,
+        val password: String,
+        val region: String,
+        val nombre: String,
+        val apellido1: String,
+        val apellido2: String
+    )
+
+
 
 
 
@@ -517,6 +552,9 @@ class DatabaseManager(private val context: Context) {
 
     // Clase de dispositivo que incluye la descripción, tipo y número de serie
     data class Device(val description: String, val tipo: String, val numeroSerie: Int)
+
+
+
 }
 
 
